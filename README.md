@@ -1,6 +1,6 @@
-### Trabalho de PS
+# Trabalho de PS
 
-# Time:
+## Time:
 
 - Gerson Menezes
 - Lourenço Mulling
