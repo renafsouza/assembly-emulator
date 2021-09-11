@@ -2,7 +2,7 @@
 
 # Time:
 
--Gerson Menezes
+- Gerson Menezes
 - Lourenço Mulling
 - Kevin Cachorrão
 - Renã Souza
