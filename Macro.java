@@ -4,8 +4,14 @@ import java.util.*;
 public class Macro {
     private String[] parametros;
     private ArrayList<String> instrucoes;
+    public boolean exists;
     
+    public Macro(boolean exists){
+        this.exists = false;
+        this.instrucoes = new ArrayList<>();
+    }
     public Macro(){
+        this.exists = true;
         this.instrucoes = new ArrayList<>();
     }
 
@@ -17,15 +23,26 @@ public class Macro {
         String[] words = line.replaceAll(","," ").split("\\s+");
         this.parametros = Arrays.copyOfRange(words, 2, words.length);
     }
-    
-    public ArrayList<String> getInstrucoes(String callInstruction){
+
+    public Map<String,String> getContext(String callInstruction){
+        Map<String,String> context = new HashMap<String, String>();
         String[] words = callInstruction.replaceAll(","," ").split("\\s+");
         String[] parametrosReais = Arrays.copyOfRange(words, 1, words.length);
+        for(int i=0;i<parametrosReais.length;i++){
+            context.put(this.parametros[i],parametrosReais[i]);
+        }
+        return context;
+    }
+    
+    public ArrayList<String> getInstrucoes(Map<String, String> context){
         ArrayList<String> ins = new ArrayList<>(this.instrucoes);
         
         for(int i=0; i<this.instrucoes.size(); i++){
-            for(int j=0; j<parametrosReais.length; j++){
-                ins.set(i, ins.get(i).replaceAll(this.parametros[j], parametrosReais[j]));
+
+            Iterator iterator = context.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry varIterator = (Map.Entry) iterator.next();
+                ins.set(i, ins.get(i).replaceAll(varIterator.getKey().toString(), context.get(varIterator.getKey())));
             }
         }
         return ins;
