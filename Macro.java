@@ -42,7 +42,7 @@ public class Macro {
             Iterator iterator = context.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry varIterator = (Map.Entry) iterator.next();
-                ins.set(i, ins.get(i).replaceAll(varIterator.getKey().toString(), context.get(varIterator.getKey())));
+                ins.set(i, ins.get(i).replaceAll("(?<=[\\s,]|^)"+varIterator.getKey()+"(?=[\\s,]|$)", context.get(varIterator.getKey())));
             }
         }
         return ins;
