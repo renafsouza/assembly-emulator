@@ -1,20 +1,8 @@
 
-Dados SEGMENT
-Var1 DW 5
-Var2 DW 8
-Var3 DW 3
-Dados ENDS
-Codigo SEGMENT
-ASSUME CS: Codigo
-ASSUME DS: Dados
-
-Inicio:
-mov 1,2
-
-mov 3,4
-
-mov Mem1,5
-
-mov 1,3
-CODIGO ENDS
-END Inicio
+inicio:
+mov 1, 2
+mov AX, 2
+1dd 1, 2
+a44 4, 2
+sub 5, 3
+END inicio
