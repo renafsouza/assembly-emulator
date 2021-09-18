@@ -1,16 +1,41 @@
-macro1 MACRO a, b
-mov a, b
-macro2 MACRO c, d
-add a, b
-macro3 MACRO e, f
-sub e, c
+ENTRADA4:
+
+Dados SEGMENT
+Var1 DW 5
+Var2 DW 8
+Var3 DW 3
+Dados ENDS
+Codigo SEGMENT
+ASSUME CS: Codigo
+ASSUME DS: Dados
+
+SomaMem MACRO Mem1, Mem2 ;; Soma duas variáveis
+mov AX,Mem1
+push AX
+mov AX,Mem2
+mov DX,AX
+pop AX
+add AX,DX
+mov Mem1,AX
 ENDM
-add d, b
-ENDM
-mov AX, b
-ENDM
-inicio:
-macro1 1, 2
-macro2 3, 4
-macro3 5, 6
-END inicio
+
+
+Inicio:
+mov AX, Dados
+mov DS, AX
+mov AX,2
+mov AX, DX
+mul DX
+
+SomaMem Var1,V
+
+mov AX, Var1
+add AX, DX
+mov Var2, AX
+
+SomaMem Var1, 3
+
+SomaMem Var1, Var3
+
+CODIGO ENDS
+END Inicio

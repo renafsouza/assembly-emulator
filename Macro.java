@@ -77,7 +77,7 @@ public class Macro {
                     }
                     if(!flagParametrosReal && nivel != 0){
 
-                        setOldParametros(newMap);
+                        setOldParametros(newMap, vars[j]);
                         if(!oldParametrosFormais.equals("")){
                             String[] wordsFormais = oldParametrosFormais.replaceAll(";"," ").split("\\s+");
                             String[] wordsReais = oldParametrosReais.replaceAll(";"," ").split("\\s+");
@@ -104,36 +104,33 @@ public class Macro {
         return ins;
     }
     
-    public void setOldParametros(Map<String, Macro> newMap){
+    public int setOldParametros(Map<String, Macro> newMap, String var){
 
-        for (Map.Entry<String, Macro> entry : newMap.entrySet()) {
-            //String key = entry.getKey();
-            Macro value = entry.getValue();
-            //System.out.println("\nNinho value: " + value.getNinho());
-
-            if(value.ninho == this.ninho){
-                if(value.nivel < this.nivel){
-                    System.out.println("\nNivel value: " + value.getNivel());
-
-                    this.oldParametrosFormais = value.getParametrosFormais();
-                    this.oldParametrosReais = value.getParametrosReais();
-                }
-            }
-            // ...
+        int i = nivel-1;
+        while(i >= 0){    // Percorre cada nível acima
+            for (Map.Entry<String, Macro> entry : newMap.entrySet()) { // Procura por Macros da mesma ninhada
+                //String key = entry.getKey();
+                Macro value = entry.getValue();
+                //System.out.println("\nNinho value: " + value.getNinho());
+                if(value.ninho == this.ninho){
+                    if(value.nivel == i){
+                        System.out.println("\nNivel value: " + value.getNivel() +" i value: " + i + " var: "+ var+ " Parametros: "+Arrays.toString(value.parametrosFormais));
+                        String parametroFormal = "";
+                        for(int j = 0; j < value.parametrosFormais.length; j++){
+                            parametroFormal = value.parametrosFormais[j];
+                            if(var.equals(parametroFormal)){
+                                this.oldParametrosFormais = value.getParametrosFormais();
+                                this.oldParametrosReais = value.getParametrosReais();
+                                return 1;
+                            }
+                        }
+                            
+                    }
+                }   
+            }  
+            i--; 
         }
-
-        /*Iterator iterator = newMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-            Map.Entry macros = (Map.Entry) iterator.entrySet();
-            Macro macro = iterator.getValue();
-
-            if(1 == iterator.ninho.getValue()){
-                chamada = true;
-                macro = this.macros.get(macrosIterator.getKey());
-                this.expandMacro(macro, line, palavras);
-            }
-        }*/
+        return 0;
     }
 
     public void setNinho(int i){

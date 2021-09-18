@@ -33,8 +33,10 @@ public class Main {
 
     // Processa a macro
     public void processa() throws FileNotFoundException, IOException {
+
         String line = this.readLine("",true) ;
         while (line != null){
+            //line = line.trim().replaceAll(" +", " "); // Retira espaços vazios
             line = line.replaceAll(";;.*", "");
             line = this.readLine(line, true);
         }
