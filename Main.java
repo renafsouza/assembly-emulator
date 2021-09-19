@@ -32,19 +32,20 @@ public class Main {
     }
 
     // Processa a macro
-    public void processa() throws FileNotFoundException, IOException {
-
-        String line = this.readLine("",true) ;
+    public void processa() throws FileNotFoundException, IOException {  // Passa para um string linha por linha do buffer 
+                                                                        // e pede para o método redLine analisar
+        String line = this.readLine("", true) ;
         while (line != null){
-            //line = line.trim().replaceAll(" +", " "); // Retira espaços vazios
+
+            line = line.trim(); // Retira espaços vazios
             line = line.replaceAll(";;.*", "");
             line = this.readLine(line, true);
         }
-        this.arqSaida.close();//encerra escrita de output
+        this.arqSaida.close(); //encerra escrita de output
 
     }
     
-    public void defineMacro(String line, String[] words) throws FileNotFoundException, IOException{
+    public void defineMacro(String line, String[] words) throws FileNotFoundException, IOException{ 
         Macro macro = new Macro();
         this.macros.put(words[0], macro);
 
@@ -53,14 +54,17 @@ public class Main {
 
         macro.setParametrosFormais(line);
         line = this.readLine("", false);
+        line = line.trim();
         while(!line.contains("ENDM")){
-            if(line.contains("MACRO")){
+            if(line.contains("MACRO")){ // Pausa definição de macro para começar outra
                 contadorMacroNivel++;
                 line = this.readLine(line, false);
+                line = line.trim();
             }
             else{
                 macro.addInstrucao(line);
                 line = this.readLine(line, false);
+                line = line.trim();
             } 
         }
         contadorNinho++;
@@ -71,7 +75,7 @@ public class Main {
         
         Map<String, Macro> newMap =  macros;
         macro.setParametrosReais(line);
-        ArrayList<String> instrucoes = macro.getInstrucoes(line, newMap);
+        ArrayList<String> instrucoes = macro.getInstrucoes(line, newMap); // Pega instruções da macro expandida com os parametros formais trocados pelos parametros reais
         for(int i = 0; i<instrucoes.size();i++){
             arqSaida.write(instrucoes.get(i) + "\n");
         }
@@ -81,7 +85,7 @@ public class Main {
         boolean chamada = false;
         Macro macro;
         Iterator iterator = this.macros.entrySet().iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext()) {                        // Percorre hashMap procurando macro
             Map.Entry macrosIterator = (Map.Entry) iterator.next();
             if(line.contains(macrosIterator.getKey().toString())){
                 chamada = true;
@@ -92,12 +96,12 @@ public class Main {
         return chamada;
     }
 
-    public String readLine(String line, boolean write) throws FileNotFoundException, IOException{
+    public String readLine(String line, boolean write) throws FileNotFoundException, IOException{ // Analisa cada linha a procura de MACRO e CHAMADA
         String[] palavras = line.split("\\s+");
         if(line.contains("MACRO")){
             this.defineMacro(line, palavras);
         }else{
-            if(!this.encontraChamada(line, palavras) && write){ // Por que não buscar chamada apenas se a linha tiver label?
+            if(!this.encontraChamada(line, palavras) && write){ // Se não houver chamada, escreve linha
                 arqSaida.write(line + "\n");
             };
         }
