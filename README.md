@@ -4,7 +4,7 @@
 
 - Gerson Menezes
 - Lourenço Mulling
-- Kevin Cachorrão
+- Kevin Weitgenant
 - Renã Souza
 - Mathaus Huber
 - Vitor Torino
