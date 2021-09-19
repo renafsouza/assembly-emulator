@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
-public class Main {
+public class ProcessadorDeMacro {
 
 
     private int contadorMacroNivel = 0;
@@ -18,12 +18,12 @@ public class Main {
 
     // Método main
     public static void main(String[] args) throws FileNotFoundException,IOException{
-        Main processador = new Main("./entrada");
+        ProcessadorDeMacro processador = new ProcessadorDeMacro("./entrada");
         processador.processa();
     }
 
     // Construtor
-    public Main(String input) throws FileNotFoundException, IOException{
+    public ProcessadorDeMacro(String input) throws FileNotFoundException, IOException{
         this.input = input;
         this.macros = new HashMap<String, Macro>();
         this.bf = new BufferedReader(new FileReader(this.input + ".txt"));
@@ -81,7 +81,7 @@ public class Main {
         }
     }
 
-    public boolean encontraChamada(String line, String[] palavras)throws FileNotFoundException, IOException{
+    public boolean isMacroCall(String line, String[] palavras)throws FileNotFoundException, IOException{
         boolean chamada = false;
         Macro macro;
         Iterator iterator = this.macros.entrySet().iterator();
@@ -101,7 +101,7 @@ public class Main {
         if(line.contains("MACRO")){
             this.defineMacro(line, palavras);
         }else{
-            if(!this.encontraChamada(line, palavras) && write){ // Se não houver chamada, escreve linha
+            if(!this.isMacroCall(line, palavras) && write){ // Se não houver chamada, escreve linha
                 arqSaida.write(line + "\n");
             };
         }
