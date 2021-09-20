@@ -10,10 +10,12 @@
 - Vitor Torino
 - Wilians Junior
 
-Compilar
+## Compilar
+
 ``javac ProcessadorDeMacro.java Macro.java``
 
-Executar
+## Executar
+
 ``java ProcessadorDeMacro``
 
 Arquivo de entrada: entrada.txt
