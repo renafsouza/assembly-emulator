@@ -1,15 +1,41 @@
+/* Os valores da
+/* O banco de memória é uma lista (JList) de Strings. Cada linha começa com o endereço da memória, seguido do primeiro byte e 
+* depois o segundo byte, cada bloco é separado por espaço. Ex: 0001 0000 0101.
+* Para pegar um valor da memória basta escrever listMemoryModel.get(index), essa função vai retornar uma string
+* Para setar um valor escreva listMemoryModel.set(index, string);
+* O banco de registrador também é uma lista(JList) de String e funciona como o banco de memória
+* use os métodos listRegisterModel.get(index) e listRegisterModel.set(index, string) para pegar e setar um valor.
+* No método initRegister() é possível ver a posição de cada registrador.
+* A caixa do código fonte é um campo de texto que pode ser editado. Use o método codigoFonteField.getText() 
+* para pegar o texto. Ao carregar um arquivo no botão "Carregar Arquivo" basta setar o texto com o método codigoFonteField.setText().
+*/
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.util.Vector;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
 
-/**
- *
- * @author Lourenço
- */
+
 public class TelaPrincipal extends javax.swing.JFrame {
 
+    
+    private DefaultListModel<String> listMemoryModel = new DefaultListModel<>();
+    private DefaultListModel<String> listRegisterModel = new DefaultListModel<>();
+    
     /**
      * Creates new form TelaPrincipal
      */
     public TelaPrincipal() {
         initComponents();
+        initMemoria();
+        initRegister();
     }
 
     /**
@@ -24,23 +50,26 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jDialog1 = new javax.swing.JDialog();
         jDialog2 = new javax.swing.JDialog();
         jDialog3 = new javax.swing.JDialog();
-        NextStep = new javax.swing.JButton();
-        RunAll = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        EnderecosDeMemoria = new javax.swing.JTextArea();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        nextStep = new javax.swing.JButton();
+        runAll = new javax.swing.JButton();
+        codigoFonteLabel = new javax.swing.JLabel();
+        memoriaLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        CodigoFonte = new javax.swing.JTextArea();
+        CodigoFonteField = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        Registradoes = new javax.swing.JTextArea();
-        jLabel4 = new javax.swing.JLabel();
+        terminalLabel = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        EntradaDeComandos = new javax.swing.JTextArea();
-        ENTER = new javax.swing.JButton();
-        SaidaDeComandos = new javax.swing.JLabel();
+        entradaTerminalField = new javax.swing.JTextArea();
+        enterTerminalButton = new javax.swing.JButton();
         CarregarArquivo = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        memoria = new javax.swing.JList<>();
+        localizaMemoryField = new javax.swing.JTextField();
+        localizaMemoryButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        registers = new javax.swing.JList<>();
+        nextMemoryButton = new javax.swing.JButton();
+        prevMomoryButton = new javax.swing.JButton();
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -78,74 +107,102 @@ public class TelaPrincipal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 0, 1, 1));
 
-        NextStep.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        NextStep.setText("Next Step");
-        NextStep.addActionListener(new java.awt.event.ActionListener() {
+        nextStep.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        nextStep.setText("Next Step");
+        nextStep.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                NextStepActionPerformed(evt);
+                nextStepActionPerformed(evt);
             }
         });
 
-        RunAll.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        RunAll.setText("RUN ALL");
-        RunAll.addActionListener(new java.awt.event.ActionListener() {
+        runAll.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        runAll.setText("Run All");
+        runAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                RunAllActionPerformed(evt);
+                runAllActionPerformed(evt);
             }
         });
 
-        EnderecosDeMemoria.setColumns(20);
-        EnderecosDeMemoria.setRows(5);
-        EnderecosDeMemoria.setText("01 05  14 \n02 06  15\n03 13  14 15\n04 11\n05 xx (09)\n06 xx (10)\n07 xx (11)\n08 xx (12)\n09 xx (13)\n10 14\n11 15\n");
-        jScrollPane1.setViewportView(EnderecosDeMemoria);
+        codigoFonteLabel.setBackground(new java.awt.Color(0, 0, 0));
+        codigoFonteLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        codigoFonteLabel.setText("Código Fonte");
+        codigoFonteLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel1.setText("Código Fonte");
-        jLabel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        memoriaLabel.setBackground(new java.awt.Color(0, 0, 0));
+        memoriaLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        memoriaLabel.setText("Endereços de Memoria");
+        memoriaLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        jLabel2.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel2.setText("Endereços de Memoria");
-        jLabel2.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
-        CodigoFonte.setColumns(20);
-        CodigoFonte.setRows(5);
-        CodigoFonte.setText("01 read posA\n02 load posB\n03 mov  posA posB\n04 stop\n05 space\n06 space\n07 space\n08 space\n09 space\n10 pos posA\n11 pos posB\n");
-        jScrollPane2.setViewportView(CodigoFonte);
+        CodigoFonteField.setColumns(20);
+        CodigoFonteField.setRows(5);
+        CodigoFonteField.setText("01 read posA\n02 load posB\n03 mov  posA posB\n04 stop\n05 space\n06 space\n07 space\n08 space\n09 space\n10 pos posA\n11 pos posB\n");
+        jScrollPane2.setViewportView(CodigoFonteField);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setText("Registradores");
 
-        Registradoes.setColumns(20);
-        Registradoes.setRows(5);
-        Registradoes.setText("AX\nDX\n");
-        jScrollPane3.setViewportView(Registradoes);
+        terminalLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        terminalLabel.setText("Terminal");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel4.setText("Terminal");
+        entradaTerminalField.setColumns(20);
+        entradaTerminalField.setRows(5);
+        entradaTerminalField.setText("523");
+        jScrollPane4.setViewportView(entradaTerminalField);
 
-        EntradaDeComandos.setColumns(20);
-        EntradaDeComandos.setRows(5);
-        EntradaDeComandos.setText("523");
-        jScrollPane4.setViewportView(EntradaDeComandos);
-
-        ENTER.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
-        ENTER.setText("ENTER");
-        ENTER.addActionListener(new java.awt.event.ActionListener() {
+        enterTerminalButton.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        enterTerminalButton.setText("ENTER");
+        enterTerminalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ENTERActionPerformed(evt);
+                enterTerminalButtonActionPerformed(evt);
             }
         });
-
-        SaidaDeComandos.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        SaidaDeComandos.setText("Saida de comandos");
 
         CarregarArquivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         CarregarArquivo.setText("Carregar Arquivo");
         CarregarArquivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CarregarArquivoActionPerformed(evt);
+            }
+        });
+
+        memoria.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane5.setViewportView(memoria);
+
+        localizaMemoryField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                localizaMemoryFieldActionPerformed(evt);
+            }
+        });
+
+        localizaMemoryButton.setText("Localizar memória");
+        localizaMemoryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                localizaMemoryButtonActionPerformed(evt);
+            }
+        });
+
+        registers.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(registers);
+
+        nextMemoryButton.setText("NEXT");
+        nextMemoryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nextMemoryButtonActionPerformed(evt);
+            }
+        });
+
+        prevMomoryButton.setText("PREV");
+        prevMomoryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prevMomoryButtonActionPerformed(evt);
             }
         });
 
@@ -156,86 +213,170 @@ public class TelaPrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jScrollPane4)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SaidaDeComandos, javax.swing.GroupLayout.PREFERRED_SIZE, 869, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
-                    .addComponent(ENTER, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
-                        .addComponent(NextStep, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 563, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(RunAll, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(CarregarArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addComponent(enterTerminalButton, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(terminalLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(codigoFonteLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(21, 21, 21))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(CarregarArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(runAll, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(nextStep, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGap(18, 18, 18)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(localizaMemoryField, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(localizaMemoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(prevMomoryButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(nextMemoryButton))
+                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(memoriaLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jScrollPane1)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))))))
+                .addGap(1026, 1026, 1026))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(RunAll)
-                    .addComponent(NextStep)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(codigoFonteLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(memoriaLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(prevMomoryButton)
+                            .addComponent(nextMemoryButton)
+                            .addComponent(nextStep))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(localizaMemoryField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(localizaMemoryButton)
+                            .addComponent(runAll)))
+                    .addComponent(CarregarArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SaidaDeComandos, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(CarregarArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(terminalLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(ENTER, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(enterTerminalButton, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(858, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>                        
-
-    private void NextStepActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    
+  
+    public void initMemoria(){
+       
+        String[] memo = new String[4096];
+        
+        for(int i = 0; i<4096; i++){
+            memo[i] = String.format("%04d", i) + ":" + " 000000000 00000000";
+            listMemoryModel.addElement(memo[i]);
+            //System.out.printf("Memoria: \n" + ListModel.get(i));
+        }
+        memoria.setModel(listMemoryModel);
+        
+    }
+    
+    public void initRegister(){
+        
+        String[] regis = new String[8];
+        
+        regis[0] = "AX: 00000000 00000000";
+        regis[1] = "DX: 00000000 00000000";
+        regis[2] = "SP: 00000000 00000000";
+        regis[3] = "SI: 00000000 00000000";
+        regis[4] = "IP: 00000000 00000000";
+        regis[5] = "SR: 00000000 00000000";
+        regis[6] = "CS: 00000000 00000000";
+        regis[7] = "DS: 00000000 00000000";
+        
+        for(int i = 0; i<8; i++){       
+            listRegisterModel.addElement(regis[i]);
+        }
+        registers.setModel(listRegisterModel);
+    }
+    
+    public void setMemoria (String str, int i){
+       
+        listMemoryModel.set(i, str);
+    }
+                
+    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
     }                                        
 
-    private void RunAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
+    private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here:
-        EnderecosDeMemoria.setText(CodigoFonte.getText());
+        
+        
     }                                      
 
-    private void ENTERActionPerformed(java.awt.event.ActionEvent evt) {                                      
+    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                    
         // TODO add your handling code here:
-        String Valor= EntradaDeComandos.getText();// adicionar ao registrador quando der enter
-        SaidaDeComandos.setText(Valor); // utilizar para a ultima mensagem de comando
-    }                                     
+        String Valor = new String("Testando terminal\nComando de entrada e status serão exibido aqui");
+        entradaTerminalField.setText(Valor); // utilizar para a ultima mensagem de comando
+    }                                                   
 
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {                                                
         // TODO add your handling code here:
-        String ArquivoCarregado=new String("01 tudo novo") ;
-        CodigoFonte.setText(ArquivoCarregado);
+        String ArquivoCarregado = new String("Testando Carregar arquivo\nSerá exibido conteúdo do arquivo aqui...") ;
+        CodigoFonteField.setText(ArquivoCarregado);
     }                                               
+
+    private void localizaMemoryFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+        // TODO add your handling code here:
+        String str = localizaMemoryField.getText();
+        memoria.ensureIndexIsVisible(Integer.parseInt(str));
+    }                                                   
+
+    private void localizaMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                     
+        // TODO add your handling code here:
+        String str = localizaMemoryField.getText();
+        memoria.ensureIndexIsVisible(Integer.parseInt(str));
+    }                                                    
+
+    private void nextMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+        int i = memoria.getLastVisibleIndex() + 22;
+        memoria.ensureIndexIsVisible(i);
+    }                                                
+
+    private void prevMomoryButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+        int i = memoria.getFirstVisibleIndex() - 22;
+        memoria.ensureIndexIsVisible(i);
+       
+    }                                                
 
     /**
      * @param args the command line arguments
@@ -274,24 +415,27 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton CarregarArquivo;
-    private javax.swing.JTextArea CodigoFonte;
-    private javax.swing.JButton ENTER;
-    private javax.swing.JTextArea EnderecosDeMemoria;
-    private javax.swing.JTextArea EntradaDeComandos;
-    private javax.swing.JButton NextStep;
-    private javax.swing.JTextArea Registradoes;
-    private javax.swing.JButton RunAll;
-    private javax.swing.JLabel SaidaDeComandos;
+    private javax.swing.JTextArea CodigoFonteField;
+    private javax.swing.JLabel codigoFonteLabel;
+    private javax.swing.JButton enterTerminalButton;
+    private javax.swing.JTextArea entradaTerminalField;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
     private javax.swing.JDialog jDialog3;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JButton localizaMemoryButton;
+    private javax.swing.JTextField localizaMemoryField;
+    private javax.swing.JList<String> memoria;
+    private javax.swing.JLabel memoriaLabel;
+    private javax.swing.JButton nextMemoryButton;
+    private javax.swing.JButton nextStep;
+    private javax.swing.JButton prevMomoryButton;
+    private javax.swing.JList<String> registers;
+    private javax.swing.JButton runAll;
+    private javax.swing.JLabel terminalLabel;
     // End of variables declaration                   
 }
