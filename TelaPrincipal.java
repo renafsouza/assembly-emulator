@@ -9,6 +9,7 @@
 * A caixa do código fonte é um campo de texto que pode ser editado. Use o método codigoFonteField.getText() 
 * para pegar o texto. Ao carregar um arquivo no botão "Carregar Arquivo" basta setar o texto com o método codigoFonteField.setText().
 */
+import javax.naming.ldap.SortControl;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -28,7 +29,72 @@ public class TelaPrincipal extends javax.swing.JFrame {
     
     private DefaultListModel<String> listMemoryModel = new DefaultListModel<>();
     private DefaultListModel<String> listRegisterModel = new DefaultListModel<>();
+    private int Step_Counter = 0;
+    private int Step_Counter_memory = 0;
+    Memory memory = new Memory();
+    VarTable varTable = new VarTable();
     
+    public class Memory{
+        private int[] palavras = new int[8192];
+
+        public Memory(){
+            for(int i = 0; i < 8192; i++){
+                this.palavras[i] = 0;
+            }  
+        }
+        public void setPalavra(int data,int position){
+            this.palavras[position] = data;
+        }
+
+        public int getPalavra(int position){
+            return this.palavras[position];
+        }
+    }
+
+    class LinhaTable {
+        String nome;
+        int[] reference;
+        Boolean status;
+
+        public LinhaTable(String nome, Boolean status, int reference) {
+            this.nome = nome;
+            this.reference[0] = reference;
+            this.status = status;
+        }
+
+        public void addReference(int newReference) {
+            this.reference[this.reference.length] = newReference; 
+        }
+    }
+    class VarTable {
+        private LinhaTable[] tabela;
+        int lineCounter;
+
+        public VarTable() {
+            this.lineCounter = 0;
+        }
+
+        public void addVar(String nome, Boolean status, int reference) {
+            tabela[this.lineCounter] = new LinhaTable(nome, status, reference);
+            this.lineCounter++;
+        }
+
+        public void checkVariable(String varName) {
+            for(int i = 0; i < this.tabela.length; i++) {
+                if(varName.equals(tabela[i].nome)) {
+                    if(tabela[i].status == false) {
+                        tabela[i].addReference(Step_Counter_memory);
+                    } else if (tabela[i].status == true) {
+
+                    }
+
+                } else {
+                    this.addVar(varName, false, Step_Counter_memory);
+                }
+            }
+        }
+    }
+
     /**
      * Creates new form TelaPrincipal
      */
@@ -135,7 +201,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         CodigoFonteField.setColumns(20);
         CodigoFonteField.setRows(5);
-        CodigoFonteField.setText("01 read posA\n02 load posB\n03 mov  posA posB\n04 stop\n05 space\n06 space\n07 space\n08 space\n09 space\n10 pos posA\n11 pos posB\n");
+        CodigoFonteField.setText("read posA\nload posB\nmov  posA posB\nstop\nspace\nspace\nspace\nspace\nspace\npos posA\npos posB\n");
         jScrollPane2.setViewportView(CodigoFonteField);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -293,18 +359,17 @@ public class TelaPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>                        
     
-  
     public void initMemoria(){
-       
-        String[] memo = new String[4096];
         
-        for(int i = 0; i<4096; i++){
-            memo[i] = String.format("%04d", i) + ":" + " 000000000 00000000";
+        String[] memo = new String[4096];
+        System.out.println(memory.getPalavra(0));
+
+        listMemoryModel.clear();
+        for(int i = 0, j = 0; i<4096; i++,j+=2){
+            memo[i] = String.format("%04d", i) + ": " + String.format("%04d", memory.getPalavra(j)) + " " + String.format("%04d", memory.getPalavra(j+1));
             listMemoryModel.addElement(memo[i]);
-            //System.out.printf("Memoria: \n" + ListModel.get(i));
         }
         memoria.setModel(listMemoryModel);
-        
     }
     
     public void initRegister(){
@@ -330,15 +395,43 @@ public class TelaPrincipal extends javax.swing.JFrame {
        
         listMemoryModel.set(i, str);
     }
-                
+              
+    private String[] readTextFromSourceCode(){
+        String ArquivoCarregado = CodigoFonteField.getText();
+        String[] CommandLine = ArquivoCarregado.split("\n");
+        return CommandLine;
+    }
+
     private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        // TODO add your handling code here:
+        String[] sourceCode =  readTextFromSourceCode();
+        //pega a linha e separa as instruções
+        String[] lineArguments = sourceCode[Step_Counter].split(" ");
+    
+        for(int i = 0; i < lineArguments.length; i++) {
+
+            //Switch pode virar um método
+            switch(lineArguments[0]){
+                case "read":
+                    memory.setPalavra(12, Step_Counter_memory); 
+                break;
+            }
+
+            // Checando quantidade de argumentos na linha.
+            if(lineArguments.length == 2) {
+                varTable.checkVariable(lineArguments[1]);
+            } else if (lineArguments.length == 3) {
+                varTable.checkVariable(lineArguments[1]);
+                varTable.checkVariable(lineArguments[2]);                
+            }
+
+        }
+        initMemoria();
+        Step_Counter++;
+        Step_Counter_memory++;
     }                                        
 
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
-        // TODO add your handling code here:
-        
-        
+        // TODO add your handling code here: 
     }                                      
 
     private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                    
