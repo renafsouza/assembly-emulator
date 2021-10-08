@@ -238,7 +238,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         outputScreenLabel.setBounds(50, 90, 130, 110);
 
         imageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        // imageLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/computerImage.jpg"))); // NOI18N
+        imageLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/computerImage.jpg"))); // NOI18N
         displayPanel.add(imageLabel);
         imageLabel.setBounds(10, 40, 230, 260);
 
