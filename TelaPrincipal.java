@@ -609,9 +609,26 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {                                                
         // TODO add your handling code here:
-        String ArquivoCarregado = new String("Testando Carregar arquivo\nSerá exibido conteúdo do arquivo aqui...") ;
-        CodigoFonteField.setText(ArquivoCarregado);
-    }                                               
+        String ArquivoCarregado = new String("") ;
+        String linha =new String();
+        String CaminhoDoArquivo =new String(System.getProperty("user.dir")+"\\src\\file.txt");
+        BufferedReader buffRead; //reader do arquivo
+        try {
+            System.out.println(linha);
+            buffRead = new BufferedReader(new FileReader(CaminhoDoArquivo));
+            linha = buffRead.readLine();
+            while (linha!=null) {                
+                ArquivoCarregado=ArquivoCarregado.concat(linha+"\n");
+                linha= buffRead.readLine();
+            }
+            CodigoFonteField.setText(ArquivoCarregado);
+            buffRead.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     private void localizaMemoryFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                    
         // TODO add your handling code here:
