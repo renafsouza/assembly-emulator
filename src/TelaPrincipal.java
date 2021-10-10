@@ -14,6 +14,11 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -73,7 +78,9 @@ public class TelaPrincipal extends javax.swing.JFrame{
         codePanel = new javax.swing.JPanel();
         codigoFonteLabel = new javax.swing.JLabel();
         inputCodeScroll = new javax.swing.JScrollPane();
-        CodigoFonteField = new javax.swing.JTextArea();
+        CodigoFonteField = new javax.swing.JTextPane();
+
+
         CarregarArquivo = new javax.swing.JButton();
         nextStep = new javax.swing.JButton();
         runAll = new javax.swing.JButton();
@@ -177,9 +184,12 @@ public class TelaPrincipal extends javax.swing.JFrame{
         codigoFonteLabel.setText("Código Fonte");
         codigoFonteLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        CodigoFonteField.setColumns(20);
-        CodigoFonteField.setRows(5);
+        // CodigoFonteField.setColumns(20);
+        // CodigoFonteField.setRows(5);
         CodigoFonteField.setText("read posA\nload posB\nmov  posA posB\nstop\nspace\nspace\nspace\nspace\nspace\npos posA\npos posB\nhlt\n");
+        this.highlightLine();
+
+
         inputCodeScroll.setViewportView(CodigoFonteField);
 
         CarregarArquivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -489,13 +499,34 @@ public class TelaPrincipal extends javax.swing.JFrame{
     private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStepActionPerformed
         emulador.loadInstructions(CodigoFonteField.getText());
         //pega a linha e separa as instruções
-
-        if(!emulador.finished)
+        if(!emulador.finished){
             emulador.step();
+            if(!emulador.finished)
+                this.highlightLine();
+        }
 
         initMemoria();
     }//GEN-LAST:event_nextStepActionPerformed
         
+    private void highlightLine (){
+        try {
+            Highlighter hilite = new DefaultHighlighter();
+            CodigoFonteField.setHighlighter(hilite);
+            String word = CodigoFonteField.getText();
+            int index = 0;
+            int index2 = word.indexOf("\n", index + 1);
+            System.out.println(index);
+            for(int i=0;i<emulador.Step_Counter_memory;i++){
+                index = word.indexOf("\n", index + 1);
+                index2 = word.indexOf("\n", index + 1);
+            }
+
+            DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
+            hilite.addHighlight(index, index2, painter);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here: 
         if(!emulador.finished)
@@ -518,6 +549,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
             }
             emulador.loadInstructions(ArquivoCarregado);
             CodigoFonteField.setText(ArquivoCarregado);
+            this.highlightLine();
             buffRead.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
@@ -602,7 +634,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CarregarArquivo;
-    private javax.swing.JTextArea CodigoFonteField;
+    private javax.swing.JTextPane CodigoFonteField;
     private javax.swing.JPanel codePanel;
     private javax.swing.JLabel codigoFonteLabel;
     private javax.swing.JTextField displayInputFiled;

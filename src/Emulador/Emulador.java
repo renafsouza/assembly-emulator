@@ -11,7 +11,7 @@ package Emulador;
 public class Emulador {
     public Memory memory = new Memory();
     private String[] instructions;
-    private int Step_Counter_memory = 0;
+    public int Step_Counter_memory = 0;
     public boolean finished = false;
     private VarTable varTable = new VarTable();
     
