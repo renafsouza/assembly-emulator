@@ -29,10 +29,6 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
 
 
 public class TelaPrincipal extends javax.swing.JFrame{
@@ -40,89 +36,9 @@ public class TelaPrincipal extends javax.swing.JFrame{
     
     private DefaultListModel<String> listMemoryModel = new DefaultListModel<>();
     private DefaultListModel<String> listRegisterModel = new DefaultListModel<>();
-    private int Step_Counter = 0;
-    private int Step_Counter_memory = 0;
-    Memory memory = new Memory();
-    VarTable varTable = new VarTable();
+    private Emulador.Emulador emulador = new Emulador.Emulador();
     
-    public class Memory{
-        private int[] palavras = new int[8192];
 
-        public Memory(){
-            for(int i = 0; i < 8192; i++){
-                this.palavras[i] = 0;
-            }  
-        }
-        public void setPalavra(int data,int position){
-            this.palavras[position] = data;
-        }
-
-        public int getPalavra(int position){
-            return this.palavras[position];
-        }
-    }
-
-    class LinhaTable {
-        String name;
-        ArrayList<Integer> reference;
-        Boolean status;
-
-        public LinhaTable(String nome, Boolean status, int reference) {
-            this.name = nome;
-            this.reference = new ArrayList<Integer>();
-            this.status = status;
-        }
-
-        public void addReference(int newReference) {
-            this.reference.add(newReference); 
-        }
-    }
-    class VarTable {
-        private ArrayList<LinhaTable> tabela;
-        private int lineCounter;
-
-        public VarTable() {
-            this.tabela = new ArrayList<LinhaTable>();
-            this.lineCounter = 0;
-        }
-
-        public boolean hasItemName(String varName) {
-            if(this.tabela.size() == 0) {
-                return false;
-            }
-
-            for(int i = 0; i < this.tabela.size(); i++) {
-                if(this.tabela.get(i).name == varName)
-                    return true;
-            }
-            return false;
-        }
-
-        public void addVar(String nome, Boolean status, int reference) {
-            this.tabela.add(new LinhaTable(nome, status, reference));
-            this.lineCounter++;
-        }
-
-        public void checkVariable(String varName) {
-
-            if(this.tabela.size() == 0)
-                this.addVar(varName, false, Step_Counter_memory);
-
-            for(int i = 0; i < this.tabela.size(); i++) {
-                if(this.hasItemName(varName)){
-                    if(this.tabela.get(0).status == false) {
-                        this.tabela.get(i).addReference(Step_Counter_memory);
-                    } else if (this.tabela.get(i).status == true) {
-
-                    }
-
-                } else {
-                    this.addVar(varName, false, Step_Counter_memory);
-                }
-            }
-        }
-    }
-    
     /**
      * Creates new form TelaPrincipal
      */
@@ -263,7 +179,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
         CodigoFonteField.setColumns(20);
         CodigoFonteField.setRows(5);
-        CodigoFonteField.setText("read posA\nload posB\nmov  posA posB\nstop\nspace\nspace\nspace\nspace\nspace\npos posA\npos posB\n");
+        CodigoFonteField.setText("read posA\nload posB\nmov  posA posB\nstop\nspace\nspace\nspace\nspace\nspace\npos posA\npos posB\nhlt\n");
         inputCodeScroll.setViewportView(CodigoFonteField);
 
         CarregarArquivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -534,7 +450,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         
         listMemoryModel.clear();
         for(int i = 0, j = 0; i<4096; i++,j+=2){
-            memo[i] = String.format("%04d", i) + ": " + String.format("%04d", memory.getPalavra(j)) + " " + String.format("%04d", memory.getPalavra(j+1));
+            memo[i] = String.format("%04d", i) + ": " + String.format("%04d", emulador.memory.getPalavra(j)) + " " + String.format("%04d", emulador.memory.getPalavra(j+1));
             listMemoryModel.addElement(memo[i]);
         }
         memoria.setModel(listMemoryModel);
@@ -571,52 +487,26 @@ public class TelaPrincipal extends javax.swing.JFrame{
     }
 
     private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStepActionPerformed
-        String[] sourceCode =  readTextFromSourceCode();
+        emulador.loadInstructions(CodigoFonteField.getText());
         //pega a linha e separa as instruções
-        String[] lineArguments = sourceCode[Step_Counter].split(" ");
-    
-        //Switch pode virar um método
-        switch(lineArguments[0]){
-            case "read":
-                memory.setPalavra(12, Step_Counter_memory); 
-            break;
-            case "load":
-                memory.setPalavra(13, Step_Counter_memory);
-                break;
-        }
-        Step_Counter_memory++;
 
-        // Checando quantidade de argumentos na linha.
-        if(lineArguments.length == 2) {
-            
-            varTable.checkVariable(lineArguments[1]);
-            Step_Counter_memory++;
+        if(!emulador.finished)
+            emulador.step();
 
-            System.out.println(Step_Counter_memory);
-        } else if (lineArguments.length == 3) {
-
-            varTable.checkVariable(lineArguments[1]);
-            Step_Counter_memory++;
-
-            varTable.checkVariable(lineArguments[2]);                
-            Step_Counter_memory++;
-
-            System.out.println(Step_Counter_memory);
-        }
-        
         initMemoria();
-        Step_Counter++;
     }//GEN-LAST:event_nextStepActionPerformed
         
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here: 
+        if(!emulador.finished)
+            emulador.run();
     }                                      
 
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarregarArquivoActionPerformed
         // TODO add your handling code here:
         String ArquivoCarregado = new String("") ;
         String linha =new String();
-        String CaminhoDoArquivo =new String(System.getProperty("user.dir")+"\\src\\file.txt");
+        String CaminhoDoArquivo =new String(System.getProperty("user.dir")+"/src/file.txt");
         BufferedReader buffRead; //reader do arquivo
         try {
             System.out.println(linha);
@@ -626,6 +516,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
                 ArquivoCarregado=ArquivoCarregado.concat(linha+"\n");
                 linha= buffRead.readLine();
             }
+            emulador.loadInstructions(ArquivoCarregado);
             CodigoFonteField.setText(ArquivoCarregado);
             buffRead.close();
         } catch (FileNotFoundException ex) {
