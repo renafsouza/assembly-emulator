@@ -29,4 +29,12 @@ public class Util {
         System.out.println(word);
         return word.substring(0, 8) + " " + word.substring(8,16);
     }
+    static boolean getBit( int k,int n) {
+        return ((k >> n) & 1)==1;
+    }
+    public static int setBit(int target,int bit,  boolean value) {
+        int mask = 1 << bit;
+        System.out.println(target | mask);
+        return target | mask;
+    }
 }

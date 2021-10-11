@@ -83,31 +83,22 @@ public class Emulador {
         }
 
     }
-    boolean getBit( int k,int n) {
-        n=16-n;
-        return (n>>k)%2==1;
-    }
-    public int setBit(int target,int bit,  boolean value) {
-        int mask = 1 << bit;
-        System.out.println(target | mask);
-        return target | mask;
-    }
     
     
     public boolean getFlag(String flag){
         switch(flag){
             case "of":
-                return getBit(this.SR,12 );
+                return Util.getBit(this.SR,12 );
             case "sf":
-                return getBit(this.SR,9 );
+                return Util.getBit(this.SR,9 );
             case "zf":
-                return getBit(this.SR,8 );
+                return Util.getBit(this.SR,8 );
             case "if":
-                return getBit(this.SR,7 );
+                return Util.getBit(this.SR,7 );
             case "pf":
-                return getBit(this.SR,6 );
+                return Util.getBit(this.SR,6 );
             case "cf":
-                return getBit(this.SR,0 );
+                return Util.getBit(this.SR,0 );
             default:
                 return false;
         }
@@ -116,17 +107,17 @@ public class Emulador {
     public void setFlag(String flag, boolean value){
         switch(flag){
             case "of":
-                 this.SR = (short)setBit(this.SR, 12, value);
+                 this.SR = (short)Util.setBit(this.SR, 12, value);
             case "sf":
-                 this.SR = (short)setBit(this.SR, 9, value);
+                 this.SR = (short)Util.setBit(this.SR, 9, value);
             case "zf":
-                 this.SR = (short)setBit(this.SR, 8, value);
+                 this.SR = (short)Util.setBit(this.SR, 8, value);
             case "if":
-                 this.SR = (short)setBit(this.SR, 7, value);
+                 this.SR = (short)Util.setBit(this.SR, 7, value);
             case "pf":
-                 this.SR = (short)setBit(this.SR, 6, value);
+                 this.SR = (short)Util.setBit(this.SR, 6, value);
             case "cf":
-                 this.SR = (short)setBit(this.SR, 0, value);
+                 this.SR = (short)Util.setBit(this.SR, 0, value);
         }
     }
 
