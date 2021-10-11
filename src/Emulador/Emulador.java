@@ -18,12 +18,12 @@ public class Emulador {
     public boolean finished = false;
     private VarTable varTable = new VarTable();
 
-    private short AX = 0;
-    private short DX = 0;
-    private short SP = 0;
-    private short SI = 0;
-    private short IP = 0;
-    private short SR = 0;
+    public short AX = 0;
+    public short DX = 0;
+    public short SP = 0;
+    public short SI = 0;
+    public short IP = 0;
+    public short SR = 0;
 
 
     // Flags
@@ -136,5 +136,4 @@ public class Emulador {
         // varTable.checkVariable(opds[1], this.Step_Counter_memory);  
         return 1;
     }
-
 }

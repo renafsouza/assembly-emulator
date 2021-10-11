@@ -468,7 +468,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         
         listMemoryModel.clear();
         for(int i = 0, j = 0; i<4096; i++,j+=2){
-            memo[i] = String.format("%04d", i) + ": " + String.format("%04d", emulador.memory.getPalavra(j)) + " " + String.format("%04d", emulador.memory.getPalavra(j+1));
+            memo[i] = String.format("%04d", i) + ": " + Emulador.Util.convertIntegerToBinary(emulador.memory.getPalavra(j));
             listMemoryModel.addElement(memo[i]);
         }
         memoria.setModel(listMemoryModel);
@@ -478,15 +478,17 @@ public class TelaPrincipal extends javax.swing.JFrame{
         
         String[] regis = new String[8];
         
-        regis[0] = "AX: 00000000 00000000";
-        regis[1] = "DX: 00000000 00000000";
-        regis[2] = "SP: 00000000 00000000";
-        regis[3] = "SI: 00000000 00000000";
-        regis[4] = "IP: 00000000 00000000";
-        regis[5] = "SR: 00000000 00000000";
-        regis[6] = "CS: 00000000 00000000";
-        regis[7] = "DS: 00000000 00000000";
-        
+        regis[0] = "AX: "+Emulador.Util.convertIntegerToBinary(emulador.AX) ;
+        regis[1] = "DX: "+Emulador.Util.convertIntegerToBinary(emulador.DX) ;
+        regis[2] = "SP: "+Emulador.Util.convertIntegerToBinary(emulador.SP) ;
+        regis[3] = "SI: "+Emulador.Util.convertIntegerToBinary(emulador.SI) ;
+        regis[4] = "IP: "+Emulador.Util.convertIntegerToBinary(emulador.IP) ;
+        regis[5] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.SR) ;
+        // regis[6] = emulador.CS;
+        // regis[7] = emulador.DS;
+        // esses registradores existem? n encontrei eles no trabalho
+
+
         for(int i = 0; i<8; i++){       
             listRegisterModel.addElement(regis[i]);
         }
@@ -494,7 +496,6 @@ public class TelaPrincipal extends javax.swing.JFrame{
     }
     
     public void setMemoria (String str, int i){
-       
         listMemoryModel.set(i, str);
     }
                 
