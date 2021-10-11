@@ -515,6 +515,10 @@ public class TelaPrincipal extends javax.swing.JFrame{
         //pega a linha e separa as instruções
         if(!emulador.finished){
             emulador.step();
+            if(emulador.error!=null){
+                System.out.println(emulador.error);
+                emulador.reset();
+            }
             this.updateInterfaceData();
         }
 
