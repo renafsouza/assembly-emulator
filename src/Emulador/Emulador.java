@@ -6,6 +6,7 @@
 package Emulador;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 /**
  *
@@ -17,6 +18,8 @@ public class Emulador {
     public int Step_Counter_memory = 0;
     public boolean finished = false;
     private VarTable varTable = new VarTable();
+    private Stack pilha = new Stack();
+    private boolean error = false;
 
     public short AX = 0;
     public short DX = 0;
@@ -33,6 +36,7 @@ public class Emulador {
         this.finished = false;
         this.Step_Counter_memory = 0;
         this.memory = new Memory();
+        this.error = false;
     }
     public void loadInstructions(String file){
         this.instructions = file.split("\\n");
@@ -61,24 +65,79 @@ public class Emulador {
         System.out.println("Param 2: "+param2);
 
         switch(mnemonico){
+            case "":
+                break;
+            case "add":
+                //todo
+                break;
+            case "div":
+                //todo
+                break;
+            case "sub":
+                //todo
+                break;
+            case "mul":
+                //todo
+                break;
+            case "cmp":
+                //todo
+                break;
+            case "and":
+                //todo
+                break;
+            case "or":
+                //todo
+                break;
+            case "xor":
+                //todo
+                break;
             case "jmp":
                 this.Step_Counter_memory = param1;
-            break;
+                break;
             case "jz":
                 if(this.getFlag("zf"))
                     this.Step_Counter_memory = param1;
-            break;
+                break;
             case "jnz":
                 if(!this.getFlag("zf"))
                     this.Step_Counter_memory = param1;
-            break;
+                break;
+            case "jp":
+                if(!this.getFlag("sf"))
+                    this.Step_Counter_memory = param1;
+                break;
+            case "call":
+                this.Step_Counter_memory = (int)this.pilha.pop();
+                break;
+            case "ret":
+                this.pilha.push(this.Step_Counter_memory);
+                this.Step_Counter_memory = param1;
+                break;
+            case "pop":
+                //todo
+                break;
+            case "popf":
+                //todo
+                break;
+            case "push":
+                //todo
+                break;
+            case "pushf":
+                //todo
+                break;
+            case "store":
+                //todo
+                break;
             case "read":
                 this.memory.setPalavra(12, this.Step_Counter_memory); 
-            break;
+                break;
             case "load":
                 this.memory.setPalavra(13, this.Step_Counter_memory);
                 break;
             case "hlt":
+                this.error = true;
+                this.finished = true;
+            default:
                 this.finished = true;
         }
 
