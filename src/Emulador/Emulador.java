@@ -56,6 +56,8 @@ public class Emulador {
     
     public void run(){
         while(!this.finished){
+            String instruction = this.instructions[this.Step_Counter_memory];
+            if(inputStreamIndex>=inputStream.size() && instruction.matches("read.*")) break;
             this.step();
         }
     }
@@ -79,6 +81,9 @@ public class Emulador {
     }
 
     public void step(){
+        if(this.finished)
+            return;
+            
         String instruction = this.instructions[this.Step_Counter_memory++];
         System.out.println(this.Step_Counter_memory+" - "+instruction);
 
@@ -324,5 +329,12 @@ public class Emulador {
         // varTable.checkVariable(params[0], this.Step_Counter_memory);
         // varTable.checkVariable(params[1], this.Step_Counter_memory);  
         return 1;
+    }
+
+    public void input (String input){
+        this.inputStream.add(Short.parseShort(input));
+        this.outputStream.add(Util.convertIntegerToBinary(Short.parseShort(input)));
+        String instruction = this.instructions[this.Step_Counter_memory];
+        if(instruction.matches("read.*")) step();
     }
 }

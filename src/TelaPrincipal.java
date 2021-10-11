@@ -510,21 +510,28 @@ public class TelaPrincipal extends javax.swing.JFrame{
         this.highlightLine();
     }
 
-    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStepActionPerformed
+    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {
         emulador.loadInstructions(CodigoFonteField.getText());
         //pega a linha e separa as instruções
-        if(!emulador.finished){
-            emulador.step();
-            if(emulador.error!=null){
-                System.out.println(emulador.error);
-                emulador.reset();
-            }
-            this.updateInterfaceData();
+        emulador.step();
+        if(emulador.error!=null){
+            System.out.println("Erro: "+emulador.error);
+            emulador.reset();
         }
+        this.updateInterfaceData();
 
         initMemoria();
-    }//GEN-LAST:event_nextStepActionPerformed
-        
+    }
+       
+    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        this.emulador.loadInstructions(CodigoFonteField.getText());
+        // TODO add your handling code here:
+        String Valor = new String("123");
+        this.emulador.input(Valor);
+        this.updateInterfaceData();
+        // entradaTerminalField.setText(Valor); // utilizar para a ultima mensagem de comando
+    }
+ 
     private void highlightLine (){
         int lineIndex = emulador.finished ? 0 : emulador.Step_Counter_memory;
         try {
@@ -537,21 +544,22 @@ public class TelaPrincipal extends javax.swing.JFrame{
                 index = word.indexOf("\n", index + 1);
                 index2 = word.indexOf("\n", index + 1);
             }
+            index2 = index2==-1? word.length():index2;
 
             DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
-            hilite.addHighlight(index, index2, painter);
+            hilite.addHighlight(index, index2 , painter);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here: 
-        if(!emulador.finished)
-            emulador.run();
+        this.emulador.loadInstructions(CodigoFonteField.getText());
+        emulador.run();
         this.updateInterfaceData();
     }                                      
 
-    private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarregarArquivoActionPerformed
+    private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         String ArquivoCarregado = new String("") ;
         String linha =new String();
@@ -573,42 +581,36 @@ public class TelaPrincipal extends javax.swing.JFrame{
         } catch (IOException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_CarregarArquivoActionPerformed
+    }
 
-    private void localizaMemoryFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localizaMemoryFieldActionPerformed
+    private void localizaMemoryFieldActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         String str = localizaMemoryField.getText();
         memoria.ensureIndexIsVisible(Integer.parseInt(str));
-    }//GEN-LAST:event_localizaMemoryFieldActionPerformed
+    }
 
-    private void localizaMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localizaMemoryButtonActionPerformed
+    private void localizaMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         String str = localizaMemoryField.getText();
         memoria.ensureIndexIsVisible(Integer.parseInt(str));
-    }//GEN-LAST:event_localizaMemoryButtonActionPerformed
+    }
 
-    private void nextMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextMemoryButtonActionPerformed
+    private void nextMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         int i = memoria.getLastVisibleIndex() + 22;
         memoria.ensureIndexIsVisible(i);
-    }//GEN-LAST:event_nextMemoryButtonActionPerformed
+    }
 
-    private void prevMomoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevMomoryButtonActionPerformed
+    private void prevMomoryButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         int i = memoria.getFirstVisibleIndex() - 22;
         memoria.ensureIndexIsVisible(i);
        
-    }//GEN-LAST:event_prevMomoryButtonActionPerformed
+    }
 
-    private void displayInputFiledActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayInputFiledActionPerformed
+    private void displayInputFiledActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-    }//GEN-LAST:event_displayInputFiledActionPerformed
-
-    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterTerminalButtonActionPerformed
-        // TODO add your handling code here:
-        String Valor = new String("Testando terminal\nComando de entrada e status serão exibido aqui");
-        entradaTerminalField.setText(Valor); // utilizar para a ultima mensagem de comando
-    }//GEN-LAST:event_enterTerminalButtonActionPerformed
+    }
 
     /**
      * @param args the command line arguments
