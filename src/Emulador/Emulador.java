@@ -19,7 +19,7 @@ public class Emulador {
     public boolean finished = false;
     private VarTable varTable = new VarTable();
     private Stack pilha = new Stack();
-    private boolean error = false;
+    private String error;
 
     public short AX = 0;
     public short DX = 0;
@@ -36,7 +36,7 @@ public class Emulador {
         this.finished = false;
         this.Step_Counter_memory = 0;
         this.memory = new Memory();
-        this.error = false;
+        this.error = null;
     }
     public void loadInstructions(String file){
         this.instructions = file.split("\\n");
@@ -139,9 +139,9 @@ public class Emulador {
                 this.memory.setPalavra(13, this.Step_Counter_memory);
                 break;
             case "hlt":
-                this.error = true;
                 this.finished = true;
             default:
+                this.error = "Operação "+mnemonico+" não reconhecida";
                 this.finished = true;
         }
 
