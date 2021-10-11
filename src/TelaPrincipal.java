@@ -13,9 +13,12 @@ import javax.naming.ldap.SortControl;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 
@@ -43,6 +46,23 @@ public class TelaPrincipal extends javax.swing.JFrame{
     private DefaultListModel<String> listRegisterModel = new DefaultListModel<>();
     private Emulador.Emulador emulador = new Emulador.Emulador();
     
+    class HighlighterDocListener implements DocumentListener {
+        String newline = "\n";
+     
+        public void insertUpdate(DocumentEvent e) {
+            updateLog(e, "inserted into");
+        }
+        public void removeUpdate(DocumentEvent e) {
+            updateLog(e, "removed from");
+        }
+        public void changedUpdate(DocumentEvent e) {
+            //Plain text components do not fire these events
+        }
+    
+        public void updateLog(DocumentEvent e, String action) {
+            highlightLine();
+        }
+    }
 
     /**
      * Creates new form TelaPrincipal
@@ -79,6 +99,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         codigoFonteLabel = new javax.swing.JLabel();
         inputCodeScroll = new javax.swing.JScrollPane();
         CodigoFonteField = new javax.swing.JTextPane();
+        CodigoFonteField.getDocument().addDocumentListener(new HighlighterDocListener() );
 
 
         CarregarArquivo = new javax.swing.JButton();
@@ -501,22 +522,21 @@ public class TelaPrincipal extends javax.swing.JFrame{
         //pega a linha e separa as instruções
         if(!emulador.finished){
             emulador.step();
-            if(!emulador.finished)
-                this.highlightLine();
+            this.highlightLine();
         }
 
         initMemoria();
     }//GEN-LAST:event_nextStepActionPerformed
         
     private void highlightLine (){
+        int lineIndex = emulador.finished ? 0 : emulador.Step_Counter_memory;
         try {
-            Highlighter hilite = new DefaultHighlighter();
+            Highlighter hilite = CodigoFonteField.getHighlighter();
             CodigoFonteField.setHighlighter(hilite);
             String word = CodigoFonteField.getText();
             int index = 0;
             int index2 = word.indexOf("\n", index + 1);
-            System.out.println(index);
-            for(int i=0;i<emulador.Step_Counter_memory;i++){
+            for(int i=0;i<lineIndex;i++){
                 index = word.indexOf("\n", index + 1);
                 index2 = word.indexOf("\n", index + 1);
             }
@@ -531,6 +551,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         // TODO add your handling code here: 
         if(!emulador.finished)
             emulador.run();
+            this.highlightLine();
     }                                      
 
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarregarArquivoActionPerformed
@@ -540,7 +561,6 @@ public class TelaPrincipal extends javax.swing.JFrame{
         String CaminhoDoArquivo =new String(System.getProperty("user.dir")+"/src/file.txt");
         BufferedReader buffRead; //reader do arquivo
         try {
-            System.out.println(linha);
             buffRead = new BufferedReader(new FileReader(CaminhoDoArquivo));
             linha = buffRead.readLine();
             while (linha!=null) {                
