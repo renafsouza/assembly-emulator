@@ -106,24 +106,28 @@ public class Emulador {
                 if(!this.getFlag("sf"))
                     this.Step_Counter_memory = param1;
                 break;
-            case "call":
-                this.Step_Counter_memory = (int)this.pilha.pop();
-                break;
             case "ret":
+                this.Step_Counter_memory = (int)this.pilha.pop();
+                this.SP--;
+                break;
+            case "call":
                 this.pilha.push(this.Step_Counter_memory);
+                this.SP++;
                 this.Step_Counter_memory = param1;
                 break;
             case "pop":
                 //todo
                 break;
             case "popf":
-                //todo
+                this.SR = (short)this.pilha.pop();
+                this.SP++;
                 break;
             case "push":
                 //todo
                 break;
             case "pushf":
-                //todo
+                this.pilha.push(this.SR);
+                this.SP++;
                 break;
             case "store":
                 //todo

@@ -488,8 +488,8 @@ public class TelaPrincipal extends javax.swing.JFrame{
         // regis[7] = emulador.DS;
         // esses registradores existem? n encontrei eles no trabalho
 
-
-        for(int i = 0; i<8; i++){       
+        listRegisterModel.clear();
+        for(int i = 0; i<5; i++){       
             listRegisterModel.addElement(regis[i]);
         }
         registers.setModel(listRegisterModel);
@@ -505,12 +505,17 @@ public class TelaPrincipal extends javax.swing.JFrame{
         return CommandLine;
     }
 
+    private void updateInterfaceData(){
+        this.initRegister();
+        this.highlightLine();
+    }
+
     private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStepActionPerformed
         emulador.loadInstructions(CodigoFonteField.getText());
         //pega a linha e separa as instruções
         if(!emulador.finished){
             emulador.step();
-            this.highlightLine();
+            this.updateInterfaceData();
         }
 
         initMemoria();
@@ -539,7 +544,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         // TODO add your handling code here: 
         if(!emulador.finished)
             emulador.run();
-            this.highlightLine();
+        this.updateInterfaceData();
     }                                      
 
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarregarArquivoActionPerformed
