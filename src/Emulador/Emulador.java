@@ -8,19 +8,27 @@ package Emulador;
 import java.util.Arrays;
 import java.util.Stack;
 
+
 /**
  *
  * @author renafs
  */
 public class Emulador {
+
+    public enum paramTypes {
+        OPD,
+        REG,
+        NULL
+    }
+
     public Memory memory = new Memory();
     private String[] instructions;
     public int Step_Counter_memory = 0;
     public boolean finished = false;
     private VarTable varTable = new VarTable();
     private Stack pilha = new Stack();
-    private String error;
 
+    public String error;
     public short AX = 0;
     public short DX = 0;
     public short SP = 0;
@@ -48,6 +56,24 @@ public class Emulador {
         }
     }
 
+    public paramTypes paramType(String param){
+        if(param == null)
+            return paramTypes.NULL;
+        if(param.matches("AX|DX|SP|SI|IP|SR"))
+            return paramTypes.REG;
+        return paramTypes.OPD;
+    }
+
+    public boolean checkParams(String[] params, paramTypes type1, paramTypes type2){
+        return paramType(params[0]) == type1 && paramType(params[1])==type2;
+    }
+    public boolean checkParams(String[] params, String type1, paramTypes type2){
+        return params[0].matches(type1) && paramType(params[1])==type2;
+    }
+    public boolean checkParams(String[] params, String type1, String type2){
+        return params[0].matches(type1) && params[1].matches(type2);
+    }
+
     public void step(){
         String instruction = this.instructions[this.Step_Counter_memory++];
         System.out.println(this.Step_Counter_memory+" - "+instruction);
@@ -55,88 +81,146 @@ public class Emulador {
         String[] words = instruction.split("(\\s|,)+");
         String mnemonico = words[0];
 
-        String [] opds = Arrays.copyOfRange(words,1,3);
-
-
-        short param1 = calculateOpd(opds[0]);
-        short param2 = calculateOpd(opds[1]);
-
-        System.out.println("Param 1: "+param1);
-        System.out.println("Param 2: "+param2);
+        String [] params = Arrays.copyOfRange(words,1,3);
 
         switch(mnemonico){
             case "":
                 break;
             case "add":
-                //todo
+                if(checkParams(params, "AX", paramTypes.REG)){
+                    this.AX += this.getRegister(params[0]);
+                }else if(checkParams(params, "AX", paramTypes.OPD))
+                    this.AX += this.calculateOpd(params[0]);
+                else error = "Parametros invalidos";
                 break;
             case "div":
-                //todo
+                // TODO RESTO
+                if(checkParams(params, "AX|SI", paramTypes.NULL)){
+                    this.AX = (short)(this.AX / getRegister(params[0]));
+                    // this.DX = resto;
+                }
+                else error = "Parametros invalidos";
                 break;
-            case "sub":
-                //todo
+            case "sub": 
+                if(checkParams(params, "AX", paramTypes.REG)){
+                    this.AX -= this.getRegister(params[0]);
+                }else if(checkParams(params, "AX", paramTypes.OPD))
+                    this.AX -= this.calculateOpd(params[0]);
+                else error = "Parametros invalidos";
                 break;
             case "mul":
-                //todo
+                // TODO RESTO
+                if(checkParams(params, "AX|SI", paramTypes.NULL)){
+                    this.AX = (short)(this.AX / getRegister(params[0]));
+                    // this.DX = overflow;
+                }
+                else error = "Parametros invalidos";
                 break;
             case "cmp":
-                //todo
+                if(checkParams(params, "AX", paramTypes.OPD)){
+                    setFlag("ZF", this.AX == calculateOpd(params[1]));
+                }else if(checkParams(params, "AX", "DX")){
+                    setFlag("ZF", this.AX == this.DX);
+                }else error = "Parametros invalidos";
                 break;
             case "and":
-                //todo
+                if(checkParams(params, "AX", paramTypes.OPD)){
+                    //TODO bitwise and
+                }else if(checkParams(params, "AX", "AX|DX")){
+                    //TODO bitwise or
+                }else error = "Parametros invalidos";
+                break;
+            case "not":
+                if(checkParams(params, "AX", paramTypes.NULL)){
+                    //TODO bitwise not
+                }else error = "Parametros invalidos";
                 break;
             case "or":
-                //todo
+                if(checkParams(params, "AX", paramTypes.OPD)){
+                    //TODO bitwise or
+                }else if(checkParams(params, "AX", "AX|DX")){
+                    //TODO bitwise or
+                }else error = "Parametros invalidos";
                 break;
             case "xor":
-                //todo
+                if(checkParams(params, "AX", paramTypes.OPD)){
+                    //TODO bitwise xor
+                }else if(checkParams(params, "AX", "AX|DX")){
+                    //TODO bitwise xor
+                }else error = "Parametros invalidos";
                 break;
             case "jmp":
-                this.Step_Counter_memory = param1;
+                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
+                    this.Step_Counter_memory = calculateOpd(params[0]);
+                }else error = "Parametros invalidos";
                 break;
             case "jz":
-                if(this.getFlag("zf"))
-                    this.Step_Counter_memory = param1;
+                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
+                    if(this.getFlag("zf"))
+                        this.Step_Counter_memory = calculateOpd(params[0]);
+                }else error = "Parametros invalidos";
                 break;
             case "jnz":
-                if(!this.getFlag("zf"))
-                    this.Step_Counter_memory = param1;
+                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
+                    if(!this.getFlag("zf"))
+                        this.Step_Counter_memory = calculateOpd(params[0]);
+                }else error = "Parametros invalidos";
                 break;
             case "jp":
-                if(!this.getFlag("sf"))
-                    this.Step_Counter_memory = param1;
+                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
+                    if(!this.getFlag("sf"))
+                        this.Step_Counter_memory = calculateOpd(params[0]);
+                }else error = "Parametros invalidos";
                 break;
             case "ret":
-                this.Step_Counter_memory = (int)this.pilha.pop();
-                this.SP--;
+                if(checkParams(params,  paramTypes.NULL,paramTypes.NULL)){
+                    this.Step_Counter_memory = (int)this.pilha.pop();
+                    this.SP--;
+                }else error = "Parametros invalidos";
                 break;
             case "call":
-                this.pilha.push(this.Step_Counter_memory);
-                this.SP++;
-                this.Step_Counter_memory = param1;
+                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
+                    this.pilha.push(this.Step_Counter_memory);
+                    this.SP++;
+                    this.Step_Counter_memory = calculateOpd(params[0]);
+                }else error = "Parametros invalidos";
                 break;
             case "pop":
-                //todo
+                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
+                    setRegister(params[0], (short)pilha.pop());
+                }else if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
+                    setRegister(params[0], calculateOpd(params[0]));
+                }else error = "Parametros invalidos";
                 break;
             case "popf":
-                this.SR = (short)this.pilha.pop();
-                this.SP++;
+                if(checkParams(params, paramTypes.NULL, paramTypes.NULL)){
+                    this.SR = (short)this.pilha.pop();
+                    this.SP++;
+                }else error = "Parametros invalidos";
                 break;
             case "push":
-                //todo
+                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
+                    pilha.push(getRegister(params[0]));
+                }else if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
+                    pilha.push(calculateOpd(params[0]));
+                }else error = "Parametros invalidos";
                 break;
             case "pushf":
                 this.pilha.push(this.SR);
                 this.SP++;
                 break;
             case "store":
-                //todo
+                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
+                    memory.setPalavra(AX, getRegister(params[0]));
+                }else error = "Parametros invalidos";
                 break;
             case "read":
-                this.memory.setPalavra(12, this.Step_Counter_memory); 
+                // this.memory.setPalavra(this.Step_Counter_memory,12); 
                 break;
-            case "load":
-                this.memory.setPalavra(13, this.Step_Counter_memory);
+            case "load": // TODO: ESSE DAQ N APARECE NO PDF
+                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
+                    memory.getPalavra(getRegister(params[0]));
+                }else error = "Parametros invalidos";
                 break;
             case "hlt":
                 this.finished = true;
@@ -147,6 +231,42 @@ public class Emulador {
 
     }
     
+    private short getRegister(String reg){
+        switch(reg){
+            case "AX":
+            return AX;
+            case "DX":
+            return DX;
+            case "SP":
+            return SP;
+            case "SI":
+            return SI;
+            case "IP":
+            return IP;
+            case "SR":
+            return SR;
+            default: 
+            return 0;
+        }
+    }
+    private short setRegister(String reg, short value){
+        switch(reg){
+            case "AX":
+            return AX = value;
+            case "DX":
+            return DX = value;
+            case "SP":
+            return SP = value;
+            case "SI":
+            return SI = value;
+            case "IP":
+            return IP = value;
+            case "SR":
+            return SR = value;
+            default: 
+            return 0;
+        }
+    }
     
     public boolean getFlag(String flag){
         switch(flag){
@@ -186,8 +306,8 @@ public class Emulador {
 
     short calculateOpd (String opd){
         // Integrar isso aqui, n entendi como funciona
-        // varTable.checkVariable(opds[0], this.Step_Counter_memory);
-        // varTable.checkVariable(opds[1], this.Step_Counter_memory);  
+        // varTable.checkVariable(params[0], this.Step_Counter_memory);
+        // varTable.checkVariable(params[1], this.Step_Counter_memory);  
         return 1;
     }
 }
