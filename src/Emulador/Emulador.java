@@ -5,6 +5,7 @@
  */
 package Emulador;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
@@ -28,6 +29,9 @@ public class Emulador {
     private VarTable varTable = new VarTable();
     private Stack pilha = new Stack();
 
+    public ArrayList<Short> inputStream = new ArrayList<Short>();
+    private int inputStreamIndex = 0;
+    public ArrayList<String> outputStream = new ArrayList<String>();
     public String error;
     public short AX = 0;
     public short DX = 0;
@@ -215,11 +219,22 @@ public class Emulador {
                 }else error = "Parametros invalidos";
                 break;
             case "read":
-                // this.memory.setPalavra(this.Step_Counter_memory,12); 
+                if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
+                    if(inputStream.size()>inputStreamIndex){
+                        memory.setPalavra(inputStream.get(inputStreamIndex++).shortValue(), calculateOpd(params[0]));
+                    }else{
+                        Step_Counter_memory--;
+                    }
+                }else error = "Parametros invalidos";
                 break;
             case "load": // TODO: ESSE DAQ N APARECE NO PDF
                 if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
                     memory.getPalavra(getRegister(params[0]));
+                }else error = "Parametros invalidos";
+                break;
+            case "write":
+                if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
+                    outputStream.add(Util.convertIntegerToBinary(calculateOpd(params[0])));
                 }else error = "Parametros invalidos";
                 break;
             case "hlt":
