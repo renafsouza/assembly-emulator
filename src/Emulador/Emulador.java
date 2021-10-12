@@ -23,10 +23,8 @@ public class Emulador {
     }
 
     public Memory memory = new Memory();
-    private String[] instructions;
     public boolean finished = false;
     private VarTable varTable = new VarTable();
-    private Stack pilha = new Stack();
 
     public ArrayList<Short> inputStream = new ArrayList<Short>();
     private int inputStreamIndex = 0;
@@ -41,8 +39,8 @@ public class Emulador {
     public short IP = 0;
     public short SR = 0;
 
-    public short DS = 0;
-    public short CS = 0;
+    public short DS = 3000;
+    public short CS = 1000;
     public short SS = 0;
 
 
@@ -52,19 +50,128 @@ public class Emulador {
     public void reset(){
         this.finished = false;
         this.IP = 0;
+        SI = 0;
+        AX = 0;
+        DX = 0;
         this.memory = new Memory();
         this.error = null;
     }
     public void loadInstructions(String file){
-        this.instructions = file.split("\\n");
+        String[] instructions = file.split("\\n");
+        String opdRegex=".*";
+
+        for(int i =0;i<instructions.length;i++){
+            String instruction = instructions[i].replace(","," ").replace("\\s+"," ");
+            String[] words = instruction.split("(\\s|,)+");
+            String [] params = Arrays.copyOfRange(words,1,3);
+            if(instruction.matches("add AX AX"))
+                memory.setPalavra((short)0x03C0, CS+i);
+            else if(instruction.matches("add AX DX")){
+                memory.setPalavra((short)0x03C2, CS+i);
+            }else if(instruction.matches("add AX "+opdRegex)){
+                memory.setPalavra((short)0x03, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("div SI")){
+                memory.setPalavra((short)0xf7f6, CS+i);
+            }else if(instruction.matches("div AX")){
+                memory.setPalavra((short)0xf7c0, CS+i);
+            }else if(instruction.matches("sub AX AX")){
+                memory.setPalavra((short)0x2bc0, CS+i);
+            }else if(instruction.matches("sub AX DX")){
+                memory.setPalavra((short)0x2bc2, CS+i);
+            }else if(instruction.matches("sub AX "+opdRegex)){
+                memory.setPalavra((short)0x25, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("mul SI")){
+                memory.setPalavra((short)0xf7f6, CS+i);
+            }else if(instruction.matches("mul AX")){
+                memory.setPalavra((short)0xf7f0, CS+i);
+            }else if(instruction.matches("cmp AX "+opdRegex)){
+                memory.setPalavra((short)0x3d, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("cmp AX DX")){
+                memory.setPalavra((short)0x3BC2, CS+i);
+            }else if(instruction.matches("and AX AX")){
+                memory.setPalavra((short)0xf7C0, CS+i);
+            }else if(instruction.matches("and AX DX")){
+                memory.setPalavra((short)0xf7C2, CS+i);
+            }else if(instruction.matches("and AX "+opdRegex)){
+                memory.setPalavra((short)0x25, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("not AX")){
+                memory.setPalavra((short)0xF8C0, CS+i);
+            }else if(instruction.matches("or AX AX")){
+                memory.setPalavra((short)0x0BC0, CS+i);
+            }else if(instruction.matches("or AX DX")){
+                memory.setPalavra((short)0x0BC0, CS+i);
+            }else if(instruction.matches("or AX "+opdRegex)){
+                memory.setPalavra((short)0x0D, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("xor AX AX")){
+                memory.setPalavra((short)0x33C0, CS+i);
+            }else if(instruction.matches("xor AX DX")){
+                memory.setPalavra((short)0x33C2, CS+i);
+            }else if(instruction.matches("xor AX "+opdRegex)){
+                memory.setPalavra((short)0x35, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("jmp "+opdRegex)){
+                memory.setPalavra((short)0xEB, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("jz "+opdRegex)){
+                memory.setPalavra((short)0x74, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("jnz "+opdRegex)){
+                memory.setPalavra((short)0x75, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("jp "+opdRegex)){
+                memory.setPalavra((short)0x7A, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("call "+opdRegex)){
+                memory.setPalavra((short)0xE8, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("ret")){
+                memory.setPalavra((short)0xEF, CS+i);
+            }else if(instruction.matches("hlt")){
+                memory.setPalavra((short)0xEE, CS+i);
+            }else if(instruction.matches("pop AX")){
+                memory.setPalavra((short)0x58C0, CS+i);
+            }else if(instruction.matches("pop DX")){
+                memory.setPalavra((short)0x58C2, CS+i);
+            }else if(instruction.matches("pop "+opdRegex)){
+                memory.setPalavra((short)0x58, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("popf")){
+                memory.setPalavra((short)0x9C, CS+i);
+            }else if(instruction.matches("push AX")){
+                memory.setPalavra((short)0x50C0, CS+i);
+            }else if(instruction.matches("push DX")){
+                memory.setPalavra((short)0x50C2, CS+i);
+            }else if(instruction.matches("pushf")){
+                memory.setPalavra((short)0x9C, CS+i);
+            }else if(instruction.matches("store AX")){
+                memory.setPalavra((short)0x07C0, CS+i);
+            }else if(instruction.matches("store DX")){
+                memory.setPalavra((short)0x07C2, CS+i);
+            }else if(instruction.matches("read "+opdRegex)){
+                memory.setPalavra((short)0x12, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction.matches("write "+opdRegex)){
+                memory.setPalavra((short)0x08, CS+i++);
+                memory.setPalavra(calculateOpd(params[1]), CS+i);
+            }else if(instruction ==""){
+
+            }else{
+                error = "Instrução não reconhecida";
+            }
+        }
     }
     
     public void run(){
-        while(!this.finished){
-            String instruction = this.instructions[this.IP];
-            if(inputStreamIndex>=inputStream.size() && instruction.matches("read.*")) break;
-            this.step();
-        }
+        // while(!this.finished){
+            // String instruction = this.instructions[this.IP];
+        //     if(inputStreamIndex>=inputStream.size() && instruction.matches("read.*")) break;
+        //     this.step();
+        // }
     }
 
     public paramTypes paramType(String param){
@@ -86,178 +193,173 @@ public class Emulador {
     }
 
     public void step(){
-        if(finished){
-            reset();
-        }
-            
-        String instruction = this.instructions[this.IP++];
-        System.out.println(this.IP+" - "+instruction);
-
-        String[] words = instruction.split("(\\s|,)+");
-        String mnemonico = words[0];
-
-        String [] params = Arrays.copyOfRange(words,1,3);
-
-        switch(mnemonico){
-            case "":
-                break;
-            case "add":
-                if(checkParams(params, "AX", paramTypes.REG)){
-                    System.out.println("oof");
-                    AX += getRegister(params[1]);
-                }else if(checkParams(params, "AX", paramTypes.OPD))
-                    AX += calculateOpd(params[1]);
-                else error = "Parametros invalidos";
-                break;
-            case "div":
-                // TODO RESTO
-                if(checkParams(params, "AX|SI", paramTypes.NULL)){
-                    this.AX = (short)(this.AX / getRegister(params[0]));
-                    // this.DX = resto;
+        int div;
+        int mul;
+        short opd = 0;
+        if(finished) return;
+        short instruction = memory.getPalavra(CS+IP);
+        IP++;
+        switch((int)instruction){
+            case 0x03c0:// add ax
+                AX += AX;
+            break;
+            case 0x03c2:// add dx
+                AX += DX;
+            break;
+            case 0x05: // add opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                AX += opd;
+            break;
+            case 0xf7f6:// div si
+                div = AX / SI;
+                AX = (short)(div & 256);
+                DX = (short)(div >>> 8);
+            break;
+            case 0xf7c0:// div ax
+                div = AX / AX;
+                AX = (short)(div & 256);
+                DX = (short)(div >>> 8);
+            break;
+            case 0x2bc0:// sub ax
+                AX -= AX;
+            break;
+            case 0x2bc2:// sub dx
+                AX -= DX;
+            break;
+            case 0x25:// sub opd
+                memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                AX -= opd;
+            break;
+            // case 0xf7f6:// mul si
+                //todo
+            // break;
+            case 0xf7f0:// mul AX
+                mul = AX * AX;
+                AX = (short)(div & 256);
+                DX = (short)(div >>> 8);
+            break;
+            case 0x3d:// cmp opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                setFlag("zf", AX == opd);
+            break;
+            case 0x3bc2://cmp DX
+                setFlag("zf", AX == DX);
+            break;
+            case 0x23c0:// and AX
+                setFlag("zf", AX == AX);
+            break;
+            case 0x23c2:// and DX
+                AX &= AX;
+            break;
+            // case 0x25:// and opd
+                //todo
+                // IP++;
+            // break;
+            case 0xf8c0:// not ax
+                AX = (short)~AX;
+            break;
+            case 0x0bc0:// or ax
+                AX|=AX;
+            break;
+            case 0x0bc2:// or dx
+                AX|=DX;
+            break;
+            case 0x0d:// or opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                AX|=opd;
+            break;
+            case 0x33c0:// xor ax
+                AX|=AX;
+            break;
+            case 0x33c2:// xor dx
+                AX|=DX;
+            break;
+            case 0x35:// xor opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                AX^=opd;
+            break;
+            case 0xeb:// jmp
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                IP = opd;
+            break;
+            case 0x74:// jz
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                if(getFlag("zf")) IP = opd;
+            break;
+            case 0x75:// jnz
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                if(!getFlag("zf")) IP = opd;
+            break;
+            case 0x7a:// jp
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                if(!getFlag("SF")) IP = opd;
+            break;
+            case 0xe8:// call
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                memory.setPalavra(IP, SI++);
+                IP = opd;
+            break;
+            case 0xef:// ret
+                IP = memory.getPalavra(--SI);
+            break;
+            case 0x58c0:// pop ax
+                AX = memory.getPalavra(--SI);
+            break;
+            case 0x58c2:// pop dx
+                DX = memory.getPalavra(--SI);
+            break;
+            case 0x59:// pop opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                memory.setPalavra(memory.getPalavra(--SI), DS+opd);
+            break;
+            case 0x9d:// popf
+                SR = memory.getPalavra(--SI);
+            break;
+            case 0x50c0:// push ax
+                memory.setPalavra(AX, DS+opd);
+            break;
+            case 0x50c2:// push dx
+                memory.setPalavra(DX, DS+opd);
+            break;
+            case 0x9c://pushf
+                memory.setPalavra(SR, SI++);
+            break;
+            case 0x07c0:// store ax
+                //todo
+            break;
+            case 0x07c2:// store dx
+                //todo
+            break;
+            case 0x12:// read opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                if(inputStream.size()>inputStreamIndex){
+                    memory.setPalavra(inputStream.get(inputStreamIndex++).shortValue(), opd);
+                }else{
+                    IP--;
                 }
-                else error = "Parametros invalidos";
-                break;
-            case "sub": 
-                if(checkParams(params, "AX", paramTypes.REG)){
-                    this.AX -= this.getRegister(params[0]);
-                }else if(checkParams(params, "AX", paramTypes.OPD))
-                    this.AX -= this.calculateOpd(params[0]);
-                else error = "Parametros invalidos";
-                break;
-            case "mul":
-                // TODO RESTO
-                if(checkParams(params, "AX|SI", paramTypes.NULL)){
-                    this.AX = (short)(this.AX / getRegister(params[0]));
-                    // this.DX = overflow;
-                }
-                else error = "Parametros invalidos";
-                break;
-            case "cmp":
-                if(checkParams(params, "AX", paramTypes.OPD)){
-                    setFlag("ZF", this.AX == calculateOpd(params[1]));
-                }else if(checkParams(params, "AX", "DX")){
-                    setFlag("ZF", this.AX == this.DX);
-                }else error = "Parametros invalidos";
-                break;
-            case "and":
-                if(checkParams(params, "AX", paramTypes.OPD)){
-                    //TODO bitwise and
-                }else if(checkParams(params, "AX", "AX|DX")){
-                    //TODO bitwise or
-                }else error = "Parametros invalidos";
-                break;
-            case "not":
-                if(checkParams(params, "AX", paramTypes.NULL)){
-                    //TODO bitwise not
-                }else error = "Parametros invalidos";
-                break;
-            case "or":
-                if(checkParams(params, "AX", paramTypes.OPD)){
-                    //TODO bitwise or
-                }else if(checkParams(params, "AX", "AX|DX")){
-                    //TODO bitwise or
-                }else error = "Parametros invalidos";
-                break;
-            case "xor":
-                if(checkParams(params, "AX", paramTypes.OPD)){
-                    //TODO bitwise xor
-                }else if(checkParams(params, "AX", "AX|DX")){
-                    //TODO bitwise xor
-                }else error = "Parametros invalidos";
-                break;
-            case "jmp":
-                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    this.IP = calculateOpd(params[0]);
-                }else error = "Parametros invalidos";
-                break;
-            case "jz":
-                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    if(this.getFlag("zf"))
-                        this.IP = calculateOpd(params[0]);
-                }else error = "Parametros invalidos";
-                break;
-            case "jnz":
-                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    if(!this.getFlag("zf"))
-                        this.IP = calculateOpd(params[0]);
-                }else error = "Parametros invalidos";
-                break;
-            case "jp":
-                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    if(!this.getFlag("sf"))
-                        this.IP = calculateOpd(params[0]);
-                }else error = "Parametros invalidos";
-                break;
-            case "ret":
-                if(checkParams(params,  paramTypes.NULL,paramTypes.NULL)){
-                    this.IP = memory.getPalavra(SP--);
-                    this.SP--;
-                }else error = "Parametros invalidos";
-                break;
-            case "call":
-                if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    memory.setPalavra(this.IP, this.SP++);
-                    this.SP++;
-                    this.IP = calculateOpd(params[0]);
-                }else error = "Parametros invalidos";
-                break;
-            case "pop":
-                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
-                    setRegister(params[0], (short)pilha.pop());
-                }else if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
-                    setRegister(params[0], calculateOpd(params[0]));
-                }else error = "Parametros invalidos";
-                break;
-            case "popf":
-                if(checkParams(params, paramTypes.NULL, paramTypes.NULL)){
-                    this.SR = (short)this.pilha.pop();
-                    this.SP++;
-                }else error = "Parametros invalidos";
-                break;
-            case "push":
-                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
-                    pilha.push(getRegister(params[0]));
-                }else if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
-                    pilha.push(calculateOpd(params[0]));
-                }else error = "Parametros invalidos";
-                break;
-            case "pushf":
-                this.pilha.push(this.SR);
-                this.SP++;
-                break;
-            case "store":
-                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
-                    memory.setPalavra(AX, getRegister(params[0]));
-                }else error = "Parametros invalidos";
-                break;
-            case "read":
-                if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
-                    if(inputStream.size()>inputStreamIndex){
-                        memory.setPalavra(inputStream.get(inputStreamIndex++).shortValue(), calculateOpd(params[0]));
-                    }else{
-                        IP--;
-                    }
-                }else error = "Parametros invalidos";
-                break;
-            case "load": // TODO: ESSE DAQ N APARECE NO PDF
-                if(checkParams(params, paramTypes.REG, paramTypes.NULL)){
-                    memory.getPalavra(getRegister(params[0]));
-                }else error = "Parametros invalidos";
-                break;
-            case "write":
-                if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
-                    System.out.println("out: "+Util.convertIntegerToBinary(calculateOpd(params[0])));
-                    outputStream.add(Util.convertIntegerToBinary(calculateOpd(params[0])));
-                }else error = "Parametros invalidos";
-                break;
-            case "hlt":
+            break;
+            case 0x08:// write opd
+                opd = memory.getPalavra(IP++);
+                outputStream.add(Util.convertIntegerToBinary(opd));
+                System.out.println("out: "+Util.convertIntegerToBinary(opd));
+                outputStream.add(Util.convertIntegerToBinary(opd));
+            break;
+            case 0xEE: // hlt
                 this.finished = true;
-                break;
-            default:
-                this.error = "Operação "+mnemonico+" não reconhecida";
-                this.finished = true;
+            break;
         }
-
     }
     
     private short getRegister(String reg){
@@ -350,9 +452,9 @@ public class Emulador {
     }
 
     public void input (String input){
-        this.inputStream.add(Short.parseShort(input));
-        this.outputStream.add(Util.convertIntegerToBinary(Short.parseShort(input)));
-        String instruction = this.instructions[this.IP];
-        if(instruction.matches("read.*")) step();
+        // this.inputStream.add(Short.parseShort(input));
+        // this.outputStream.add(Util.convertIntegerToBinary(Short.parseShort(input)));
+        // String instruction = this.instructions[this.IP];
+        // if(instruction.matches("read.*")) step();
     }
 }

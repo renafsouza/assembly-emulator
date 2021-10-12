@@ -221,6 +221,11 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
         resetButton.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         resetButton.setText("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout codePanelLayout = new javax.swing.GroupLayout(codePanel);
         codePanel.setLayout(codePanelLayout);
@@ -525,17 +530,12 @@ public class TelaPrincipal extends javax.swing.JFrame{
         emulador.loadInstructions(CodigoFonteField.getText());
         //pega a linha e separa as instruções
         emulador.step();
-        if(emulador.error!=null){
-            System.out.println("Erro: "+emulador.error);
-            emulador.reset();
-        }
         this.updateInterfaceData();
-
         initMemoria();
     }                                        
         
     private void highlightLine (){
-        int lineIndex = emulador.finished ? 0 : emulador.SP;
+        int lineIndex = emulador.finished ? 0 : emulador.IP;
         try {
             Highlighter hilite = CodigoFonteField.getHighlighter();
             CodigoFonteField.setHighlighter(hilite);
@@ -560,7 +560,10 @@ public class TelaPrincipal extends javax.swing.JFrame{
         emulador.run();
         this.updateInterfaceData();
     }                                      
-
+    private void resetActionPerformed(java.awt.event.ActionEvent evt){
+        emulador.reset();
+        updateInterfaceData();   
+    }
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         String ArquivoCarregado = new String("") ;
