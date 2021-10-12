@@ -15,6 +15,9 @@ import java.util.Stack;
  * @author renafs
  */
 public class Emulador {
+    public void print(String word){
+        System.out.println(word);
+    }
 
     public enum paramTypes {
         OPD,
@@ -28,7 +31,7 @@ public class Emulador {
 
     public ArrayList<Short> inputStream = new ArrayList<Short>();
     private int inputStreamIndex = 0;
-    public ArrayList<String> outputStream = new ArrayList<String>();
+    public String outputStream;
     public String error;
     public short AX = 0;
     public short DX = 0;
@@ -48,121 +51,124 @@ public class Emulador {
     private boolean ZF = false;
     
     public void reset(){
-        this.finished = false;
-        this.IP = 0;
+        finished = false;
+        IP = 0;
         SI = 0;
         AX = 0;
         DX = 0;
         this.memory = new Memory();
         this.error = null;
+        this.outputStream="";
     }
     public void loadInstructions(String file){
         String[] instructions = file.split("\\n");
         String opdRegex=".*";
 
+        int j = 0;
         for(int i =0;i<instructions.length;i++){
             String instruction = instructions[i].replace(","," ").replace("\\s+"," ");
             String[] words = instruction.split("(\\s|,)+");
             String [] params = Arrays.copyOfRange(words,1,3);
             if(instruction.matches("add AX AX"))
-                memory.setPalavra((short)0x03C0, CS+i);
+                memory.setPalavra((short)0x03C0, CS+j);
             else if(instruction.matches("add AX DX")){
-                memory.setPalavra((short)0x03C2, CS+i);
+                memory.setPalavra((short)0x03C2, CS+j);
             }else if(instruction.matches("add AX "+opdRegex)){
-                memory.setPalavra((short)0x03, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x03, CS+j++);
+                memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("div SI")){
-                memory.setPalavra((short)0xf7f6, CS+i);
+                memory.setPalavra((short)0xf7f6, CS+j);
             }else if(instruction.matches("div AX")){
-                memory.setPalavra((short)0xf7c0, CS+i);
+                memory.setPalavra((short)0xf7c0, CS+j);
             }else if(instruction.matches("sub AX AX")){
-                memory.setPalavra((short)0x2bc0, CS+i);
+                memory.setPalavra((short)0x2bc0, CS+j);
             }else if(instruction.matches("sub AX DX")){
-                memory.setPalavra((short)0x2bc2, CS+i);
+                memory.setPalavra((short)0x2bc2, CS+j);
             }else if(instruction.matches("sub AX "+opdRegex)){
-                memory.setPalavra((short)0x25, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x25, CS+j++);
+                memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("mul SI")){
-                memory.setPalavra((short)0xf7f6, CS+i);
+                memory.setPalavra((short)0xf7f6, CS+j);
             }else if(instruction.matches("mul AX")){
-                memory.setPalavra((short)0xf7f0, CS+i);
+                memory.setPalavra((short)0xf7f0, CS+j);
             }else if(instruction.matches("cmp AX "+opdRegex)){
-                memory.setPalavra((short)0x3d, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x3d, CS+j++);
+                memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("cmp AX DX")){
-                memory.setPalavra((short)0x3BC2, CS+i);
+                memory.setPalavra((short)0x3BC2, CS+j);
             }else if(instruction.matches("and AX AX")){
-                memory.setPalavra((short)0xf7C0, CS+i);
+                memory.setPalavra((short)0xf7C0, CS+j);
             }else if(instruction.matches("and AX DX")){
-                memory.setPalavra((short)0xf7C2, CS+i);
+                memory.setPalavra((short)0xf7C2, CS+j);
             }else if(instruction.matches("and AX "+opdRegex)){
-                memory.setPalavra((short)0x25, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x25, CS+j++);
+                memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("not AX")){
-                memory.setPalavra((short)0xF8C0, CS+i);
+                memory.setPalavra((short)0xF8C0, CS+j);
             }else if(instruction.matches("or AX AX")){
-                memory.setPalavra((short)0x0BC0, CS+i);
+                memory.setPalavra((short)0x0BC0, CS+j);
             }else if(instruction.matches("or AX DX")){
-                memory.setPalavra((short)0x0BC0, CS+i);
+                memory.setPalavra((short)0x0BC0, CS+j);
             }else if(instruction.matches("or AX "+opdRegex)){
-                memory.setPalavra((short)0x0D, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x0D, CS+j++);
+                memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("xor AX AX")){
-                memory.setPalavra((short)0x33C0, CS+i);
+                memory.setPalavra((short)0x33C0, CS+j);
             }else if(instruction.matches("xor AX DX")){
-                memory.setPalavra((short)0x33C2, CS+i);
+                memory.setPalavra((short)0x33C2, CS+j);
             }else if(instruction.matches("xor AX "+opdRegex)){
-                memory.setPalavra((short)0x35, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x35, CS+j++);
+                memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("jmp "+opdRegex)){
-                memory.setPalavra((short)0xEB, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0xEB, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("jz "+opdRegex)){
-                memory.setPalavra((short)0x74, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x74, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("jnz "+opdRegex)){
-                memory.setPalavra((short)0x75, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x75, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("jp "+opdRegex)){
-                memory.setPalavra((short)0x7A, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x7A, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("call "+opdRegex)){
-                memory.setPalavra((short)0xE8, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0xE8, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("ret")){
-                memory.setPalavra((short)0xEF, CS+i);
+                memory.setPalavra((short)0xEF, CS+j);
             }else if(instruction.matches("hlt")){
-                memory.setPalavra((short)0xEE, CS+i);
+                memory.setPalavra((short)0xEE, CS+j);
             }else if(instruction.matches("pop AX")){
-                memory.setPalavra((short)0x58C0, CS+i);
+                memory.setPalavra((short)0x58C0, CS+j);
             }else if(instruction.matches("pop DX")){
-                memory.setPalavra((short)0x58C2, CS+i);
+                memory.setPalavra((short)0x58C2, CS+j);
             }else if(instruction.matches("pop "+opdRegex)){
-                memory.setPalavra((short)0x58, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x58, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("popf")){
-                memory.setPalavra((short)0x9C, CS+i);
+                memory.setPalavra((short)0x9C, CS+j);
             }else if(instruction.matches("push AX")){
-                memory.setPalavra((short)0x50C0, CS+i);
+                memory.setPalavra((short)0x50C0, CS+j);
             }else if(instruction.matches("push DX")){
-                memory.setPalavra((short)0x50C2, CS+i);
+                memory.setPalavra((short)0x50C2, CS+j);
             }else if(instruction.matches("pushf")){
-                memory.setPalavra((short)0x9C, CS+i);
+                memory.setPalavra((short)0x9C, CS+j);
             }else if(instruction.matches("store AX")){
-                memory.setPalavra((short)0x07C0, CS+i);
+                memory.setPalavra((short)0x07C0, CS+j);
             }else if(instruction.matches("store DX")){
-                memory.setPalavra((short)0x07C2, CS+i);
+                memory.setPalavra((short)0x07C2, CS+j);
             }else if(instruction.matches("read "+opdRegex)){
-                memory.setPalavra((short)0x12, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x12, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction.matches("write "+opdRegex)){
-                memory.setPalavra((short)0x08, CS+i++);
-                memory.setPalavra(calculateOpd(params[1]), CS+i);
+                memory.setPalavra((short)0x08, CS+j++);
+                memory.setPalavra(calculateOpd(params[0]), CS+j);
             }else if(instruction ==""){
 
             }else{
                 error = "Instrução não reconhecida";
             }
+            j++;
         }
     }
     
@@ -197,8 +203,7 @@ public class Emulador {
         int mul;
         short opd = 0;
         if(finished) return;
-        short instruction = memory.getPalavra(CS+IP);
-        IP++;
+        short instruction = memory.getPalavra(CS+IP++);
         switch((int)instruction){
             case 0x03c0:// add ax
                 AX += AX;
@@ -208,7 +213,6 @@ public class Emulador {
             break;
             case 0x05: // add opd
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 AX += opd;
             break;
             case 0xf7f6:// div si
@@ -229,7 +233,6 @@ public class Emulador {
             break;
             case 0x25:// sub opd
                 memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 AX -= opd;
             break;
             // case 0xf7f6:// mul si
@@ -237,12 +240,11 @@ public class Emulador {
             // break;
             case 0xf7f0:// mul AX
                 mul = AX * AX;
-                AX = (short)(div & 256);
-                DX = (short)(div >>> 8);
+                AX = (short)(mul & 256);
+                DX = (short)(mul >>> 8);
             break;
             case 0x3d:// cmp opd
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 setFlag("zf", AX == opd);
             break;
             case 0x3bc2://cmp DX
@@ -269,7 +271,6 @@ public class Emulador {
             break;
             case 0x0d:// or opd
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 AX|=opd;
             break;
             case 0x33c0:// xor ax
@@ -280,32 +281,26 @@ public class Emulador {
             break;
             case 0x35:// xor opd
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 AX^=opd;
             break;
             case 0xeb:// jmp
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 IP = opd;
             break;
             case 0x74:// jz
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 if(getFlag("zf")) IP = opd;
             break;
             case 0x75:// jnz
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 if(!getFlag("zf")) IP = opd;
             break;
             case 0x7a:// jp
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 if(!getFlag("SF")) IP = opd;
             break;
             case 0xe8:// call
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 memory.setPalavra(IP, SI++);
                 IP = opd;
             break;
@@ -320,7 +315,6 @@ public class Emulador {
             break;
             case 0x59:// pop opd
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
                 memory.setPalavra(memory.getPalavra(--SI), DS+opd);
             break;
             case 0x9d:// popf
@@ -343,18 +337,19 @@ public class Emulador {
             break;
             case 0x12:// read opd
                 opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
+                outputStream = Util.convertIntegerToBinary(opd);
                 if(inputStream.size()>inputStreamIndex){
+                    print("read "+inputStream.get(inputStreamIndex));
                     memory.setPalavra(inputStream.get(inputStreamIndex++).shortValue(), opd);
                 }else{
-                    IP--;
+                    print("read");
+                    IP-=2;
                 }
             break;
             case 0x08:// write opd
-                opd = memory.getPalavra(IP++);
-                outputStream.add(Util.convertIntegerToBinary(opd));
+                opd = memory.getPalavra(CS+IP++);
                 System.out.println("out: "+Util.convertIntegerToBinary(opd));
-                outputStream.add(Util.convertIntegerToBinary(opd));
+                outputStream = Util.convertIntegerToBinary(opd);
             break;
             case 0xEE: // hlt
                 this.finished = true;
@@ -452,9 +447,9 @@ public class Emulador {
     }
 
     public void input (String input){
-        // this.inputStream.add(Short.parseShort(input));
-        // this.outputStream.add(Util.convertIntegerToBinary(Short.parseShort(input)));
-        // String instruction = this.instructions[this.IP];
-        // if(instruction.matches("read.*")) step();
+        this.inputStream.add(Short.parseShort(input));
+        this.outputStream = Util.convertIntegerToBinary(Short.parseShort(input));
+        Short instruction = memory.getPalavra(CS+IP);
+        if(instruction==0x12) step();
     }
 }

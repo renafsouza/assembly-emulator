@@ -367,11 +367,10 @@ public class TelaPrincipal extends javax.swing.JFrame{
         terminalLabel.setForeground(new java.awt.Color(255, 255, 255));
         terminalLabel.setText("Terminal");
 
-        entradaTerminalField.setText("Write here...");
+        // entradaTerminalField.setText("Write here...");
 
         terminalMessageLabel.setBackground(new java.awt.Color(153, 255, 204));
         terminalMessageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        terminalMessageLabel.setText("Mensagem de saída");
         terminalMessageLabel.setOpaque(true);
 
         javax.swing.GroupLayout terminalPanelLayout = new javax.swing.GroupLayout(terminalPanel);
@@ -524,35 +523,37 @@ public class TelaPrincipal extends javax.swing.JFrame{
     private void updateInterfaceData(){
         this.initRegister();
         this.highlightLine();
+        emulador.print(emulador.outputStream);
+        terminalMessageLabel.setText(emulador.outputStream);
     }
 
     private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {
         emulador.loadInstructions(CodigoFonteField.getText());
-        //pega a linha e separa as instruções
+        this.updateInterfaceData();
         emulador.step();
         this.updateInterfaceData();
         initMemoria();
     }                                        
         
     private void highlightLine (){
-        int lineIndex = emulador.finished ? 0 : emulador.IP;
-        try {
-            Highlighter hilite = CodigoFonteField.getHighlighter();
-            CodigoFonteField.setHighlighter(hilite);
-            String word = CodigoFonteField.getText();
-            int index = 0;
-            int index2 = word.indexOf("\n", index + 1);
-            for(int i=0;i<lineIndex;i++){
-                index = word.indexOf("\n", index + 1);
-                index2 = word.indexOf("\n", index + 1);
-            }
-            index2 = index2==-1? word.length():index2;
+        // int lineIndex = emulador.finished ? 0 : emulador.IP;
+        // try {
+        //     Highlighter hilite = CodigoFonteField.getHighlighter();
+        //     CodigoFonteField.setHighlighter(hilite);
+        //     String word = CodigoFonteField.getText();
+        //     int index = 0;
+        //     int index2 = word.indexOf("\n", index + 1);
+        //     for(int i=0;i<lineIndex;i++){
+        //         index = word.indexOf("\n", index + 1);
+        //         index2 = word.indexOf("\n", index + 1);
+        //     }
+        //     index2 = index2==-1? word.length():index2;
 
-            DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
-            hilite.addHighlight(index, index2 , painter);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
+        //     DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
+        //     hilite.addHighlight(index, index2 , painter);
+        // } catch (BadLocationException e) {
+        //     e.printStackTrace();
+        // }
     }
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here: 
@@ -566,6 +567,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
     }
     private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
+        resetActionPerformed(null);
         String ArquivoCarregado = new String("") ;
         String linha =new String();
         String CaminhoDoArquivo =new String(System.getProperty("user.dir")+"/src/file.txt");
@@ -617,10 +619,11 @@ public class TelaPrincipal extends javax.swing.JFrame{
         // TODO add your handling code here:
     }                                                 
 
-    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {          
+        emulador.input(entradaTerminalField.getText());
         // TODO add your handling code here:
-        String Valor = new String("Testando terminal\nComando de entrada e status serão exibido aqui");
-        entradaTerminalField.setText(Valor); // utilizar para a ultima mensagem de comando
+        // String Valor = new String("Testando terminal\nComando de entrada e status serão exibido aqui");
+        // entradaTerminalField.setText(Valor); // utilizar para a ultima mensagem de comando
     }                                                   
 
     /**
