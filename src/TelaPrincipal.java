@@ -85,10 +85,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         codePanel = new javax.swing.JPanel();
         codigoFonteLabel = new javax.swing.JLabel();
         inputCodeScroll = new javax.swing.JScrollPane();
-        CodigoFonteField = new javax.swing.JTextPane();
-        CodigoFonteField.getDocument().addDocumentListener(new HighlighterDocListener() );
-
-
+        CodigoFonteField = new javax.swing.JTextArea();
         CarregarArquivo = new javax.swing.JButton();
         nextStep = new javax.swing.JButton();
         runAll = new javax.swing.JButton();
@@ -192,12 +189,9 @@ public class TelaPrincipal extends javax.swing.JFrame{
         codigoFonteLabel.setText("Código Fonte");
         codigoFonteLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        // CodigoFonteField.setColumns(20);
-        // CodigoFonteField.setRows(5);
-        CodigoFonteField.setText("read posA\nload posB\nmov  posA posB\nstop\nspace\nspace\nspace\nspace\nspace\npos posA\npos posB\nhlt\n");
-        this.highlightLine();
-
-
+        CodigoFonteField.setColumns(20);
+        CodigoFonteField.setRows(5);
+        CarregarArquivoActionPerformed(null);
         inputCodeScroll.setViewportView(CodigoFonteField);
 
         CarregarArquivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -653,7 +647,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CarregarArquivo;
-    private javax.swing.JTextPane CodigoFonteField;
+    private javax.swing.JTextArea CodigoFonteField;
     private javax.swing.JPanel codePanel;
     private javax.swing.JLabel codigoFonteLabel;
     private javax.swing.JTextField displayInputFiled;

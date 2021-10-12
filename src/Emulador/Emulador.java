@@ -81,8 +81,9 @@ public class Emulador {
     }
 
     public void step(){
-        if(this.finished)
-            return;
+        if(finished){
+            reset();
+        }
             
         String instruction = this.instructions[this.Step_Counter_memory++];
         System.out.println(this.Step_Counter_memory+" - "+instruction);
@@ -97,9 +98,10 @@ public class Emulador {
                 break;
             case "add":
                 if(checkParams(params, "AX", paramTypes.REG)){
-                    this.AX += this.getRegister(params[0]);
+                    System.out.println("oof");
+                    AX += getRegister(params[1]);
                 }else if(checkParams(params, "AX", paramTypes.OPD))
-                    this.AX += this.calculateOpd(params[0]);
+                    AX += calculateOpd(params[1]);
                 else error = "Parametros invalidos";
                 break;
             case "div":
@@ -239,11 +241,13 @@ public class Emulador {
                 break;
             case "write":
                 if(checkParams(params, paramTypes.OPD, paramTypes.NULL)){
+                    System.out.println("out: "+Util.convertIntegerToBinary(calculateOpd(params[0])));
                     outputStream.add(Util.convertIntegerToBinary(calculateOpd(params[0])));
                 }else error = "Parametros invalidos";
                 break;
             case "hlt":
                 this.finished = true;
+                break;
             default:
                 this.error = "Operação "+mnemonico+" não reconhecida";
                 this.finished = true;
@@ -325,6 +329,13 @@ public class Emulador {
     }
 
     short calculateOpd (String opd){
+        if(opd.matches("[0-1]+b")){
+            return Short.parseShort(opd.replace("b",""),2);
+        }if(opd.matches("#[0-9a-fA-F]+")){
+            return Short.parseShort(opd.replace("#",""),16);
+        }if(opd.matches("[0-9]+")){
+            return Short.parseShort(opd);
+        }
         // Integrar isso aqui, n entendi como funciona
         // varTable.checkVariable(params[0], this.Step_Counter_memory);
         // varTable.checkVariable(params[1], this.Step_Counter_memory);  
