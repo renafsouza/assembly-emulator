@@ -191,7 +191,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
         CodigoFonteField.setColumns(20);
         CodigoFonteField.setRows(5);
-        CarregarArquivoActionPerformed(null);
+        CodigoFonteField.setText("01 read posA\n02 load posB\n03 mov  posA posB\n04 stop\n05 space\n06 space\n07 space\n08 space\n09 space\n10 pos posA\n11 pos posB\n");
         inputCodeScroll.setViewportView(CodigoFonteField);
 
         CarregarArquivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -527,7 +527,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
     }
  
     private void highlightLine (){
-        int lineIndex = emulador.finished ? 0 : emulador.Step_Counter_memory;
+        int lineIndex = emulador.finished ? 0 : emulador.SP;
         try {
             Highlighter hilite = CodigoFonteField.getHighlighter();
             CodigoFonteField.setHighlighter(hilite);

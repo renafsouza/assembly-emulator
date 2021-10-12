@@ -24,7 +24,6 @@ public class Emulador {
 
     public Memory memory = new Memory();
     private String[] instructions;
-    public int Step_Counter_memory = 0;
     public boolean finished = false;
     private VarTable varTable = new VarTable();
     private Stack pilha = new Stack();
@@ -35,10 +34,16 @@ public class Emulador {
     public String error;
     public short AX = 0;
     public short DX = 0;
+
     public short SP = 0;
+
     public short SI = 0;
     public short IP = 0;
     public short SR = 0;
+
+    public short DS = 0;
+    public short CS = 0;
+    public short SS = 0;
 
 
     // Flags
@@ -46,7 +51,7 @@ public class Emulador {
     
     public void reset(){
         this.finished = false;
-        this.Step_Counter_memory = 0;
+        this.IP = 0;
         this.memory = new Memory();
         this.error = null;
     }
@@ -56,7 +61,7 @@ public class Emulador {
     
     public void run(){
         while(!this.finished){
-            String instruction = this.instructions[this.Step_Counter_memory];
+            String instruction = this.instructions[this.IP];
             if(inputStreamIndex>=inputStream.size() && instruction.matches("read.*")) break;
             this.step();
         }
@@ -85,8 +90,8 @@ public class Emulador {
             reset();
         }
             
-        String instruction = this.instructions[this.Step_Counter_memory++];
-        System.out.println(this.Step_Counter_memory+" - "+instruction);
+        String instruction = this.instructions[this.IP++];
+        System.out.println(this.IP+" - "+instruction);
 
         String[] words = instruction.split("(\\s|,)+");
         String mnemonico = words[0];
@@ -162,38 +167,38 @@ public class Emulador {
                 break;
             case "jmp":
                 if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    this.Step_Counter_memory = calculateOpd(params[0]);
+                    this.IP = calculateOpd(params[0]);
                 }else error = "Parametros invalidos";
                 break;
             case "jz":
                 if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
                     if(this.getFlag("zf"))
-                        this.Step_Counter_memory = calculateOpd(params[0]);
+                        this.IP = calculateOpd(params[0]);
                 }else error = "Parametros invalidos";
                 break;
             case "jnz":
                 if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
                     if(!this.getFlag("zf"))
-                        this.Step_Counter_memory = calculateOpd(params[0]);
+                        this.IP = calculateOpd(params[0]);
                 }else error = "Parametros invalidos";
                 break;
             case "jp":
                 if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
                     if(!this.getFlag("sf"))
-                        this.Step_Counter_memory = calculateOpd(params[0]);
+                        this.IP = calculateOpd(params[0]);
                 }else error = "Parametros invalidos";
                 break;
             case "ret":
                 if(checkParams(params,  paramTypes.NULL,paramTypes.NULL)){
-                    this.Step_Counter_memory = (int)this.pilha.pop();
+                    this.IP = memory.getPalavra(SP--);
                     this.SP--;
                 }else error = "Parametros invalidos";
                 break;
             case "call":
                 if(checkParams(params,  paramTypes.OPD,paramTypes.NULL)){
-                    this.pilha.push(this.Step_Counter_memory);
+                    memory.setPalavra(this.IP, this.SP++);
                     this.SP++;
-                    this.Step_Counter_memory = calculateOpd(params[0]);
+                    this.IP = calculateOpd(params[0]);
                 }else error = "Parametros invalidos";
                 break;
             case "pop":
@@ -230,7 +235,7 @@ public class Emulador {
                     if(inputStream.size()>inputStreamIndex){
                         memory.setPalavra(inputStream.get(inputStreamIndex++).shortValue(), calculateOpd(params[0]));
                     }else{
-                        Step_Counter_memory--;
+                        IP--;
                     }
                 }else error = "Parametros invalidos";
                 break;
@@ -335,17 +340,19 @@ public class Emulador {
             return Short.parseShort(opd.replace("#",""),16);
         }if(opd.matches("[0-9]+")){
             return Short.parseShort(opd);
+        }if(opd.matches("[A-Za-Z][A-Za-Z0-9]*")){
+            // TODO retorna valor da variavel
         }
         // Integrar isso aqui, n entendi como funciona
-        // varTable.checkVariable(params[0], this.Step_Counter_memory);
-        // varTable.checkVariable(params[1], this.Step_Counter_memory);  
+        // varTable.checkVariable(params[0], this.IP);
+        // varTable.checkVariable(params[1], this.IP);  
         return 1;
     }
 
     public void input (String input){
         this.inputStream.add(Short.parseShort(input));
         this.outputStream.add(Util.convertIntegerToBinary(Short.parseShort(input)));
-        String instruction = this.instructions[this.Step_Counter_memory];
+        String instruction = this.instructions[this.IP];
         if(instruction.matches("read.*")) step();
     }
 }
