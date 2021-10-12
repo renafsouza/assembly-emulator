@@ -221,6 +221,11 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
         resetButton.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         resetButton.setText("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout codePanelLayout = new javax.swing.GroupLayout(codePanel);
         codePanel.setLayout(codePanelLayout);
@@ -499,8 +504,8 @@ public class TelaPrincipal extends javax.swing.JFrame{
         // regis[7] = emulador.DS;
         // esses registradores existem? n encontrei eles no trabalho
 
-
-        for(int i = 0; i<8; i++){       
+        listRegisterModel.clear();
+        for(int i = 0; i<5; i++){       
             listRegisterModel.addElement(regis[i]);
         }
         registers.setModel(listRegisterModel);
@@ -516,19 +521,21 @@ public class TelaPrincipal extends javax.swing.JFrame{
         return CommandLine;
     }
 
-    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void updateInterfaceData(){
+        this.initRegister();
+        this.highlightLine();
+    }
+
+    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {
         emulador.loadInstructions(CodigoFonteField.getText());
         //pega a linha e separa as instruções
-        if(!emulador.finished){
-            emulador.step();
-            this.highlightLine();
-        }
-
+        emulador.step();
+        this.updateInterfaceData();
         initMemoria();
     }                                        
         
     private void highlightLine (){
-        int lineIndex = emulador.finished ? 0 : emulador.Step_Counter_memory;
+        int lineIndex = emulador.finished ? 0 : emulador.IP;
         try {
             Highlighter hilite = CodigoFonteField.getHighlighter();
             CodigoFonteField.setHighlighter(hilite);
@@ -539,21 +546,25 @@ public class TelaPrincipal extends javax.swing.JFrame{
                 index = word.indexOf("\n", index + 1);
                 index2 = word.indexOf("\n", index + 1);
             }
+            index2 = index2==-1? word.length():index2;
 
             DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
-            hilite.addHighlight(index, index2, painter);
+            hilite.addHighlight(index, index2 , painter);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here: 
-        if(!emulador.finished)
-            emulador.run();
-            this.highlightLine();
+        this.emulador.loadInstructions(CodigoFonteField.getText());
+        emulador.run();
+        this.updateInterfaceData();
     }                                      
-
-    private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {                                                
+    private void resetActionPerformed(java.awt.event.ActionEvent evt){
+        emulador.reset();
+        updateInterfaceData();   
+    }
+    private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         String ArquivoCarregado = new String("") ;
         String linha =new String();

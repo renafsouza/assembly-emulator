@@ -10,7 +10,7 @@
  */
 package Emulador;
 public class Util {
-    public static String convertIntegerToBinary(int n) {
+    public static String convertIntegerToBinary(short n) {
         if (n == 0) {
             return "0000000 0000000";
         }
@@ -26,7 +26,6 @@ public class Util {
         binaryNumber.append(n<0?1:0);
         binaryNumber = binaryNumber.reverse();
         String word =  binaryNumber.toString();
-        System.out.println(word);
         return word.substring(0, 8) + " " + word.substring(8,16);
     }
     static boolean getBit( int k,int n) {
@@ -34,7 +33,6 @@ public class Util {
     }
     public static int setBit(int target,int bit,  boolean value) {
         int mask = 1 << bit;
-        System.out.println(target | mask);
         return target | mask;
     }
 }

@@ -10,18 +10,18 @@ package Emulador;
  * @author renafs
  */
 public class Memory{
-    private int[] palavras = new int[8192];
+    private short[] palavras = new short[8192];
 
     public Memory(){
         for(int i = 0; i < 8192; i++){
-            this.palavras[i] = 0;
+            this.palavras[i] = (short)0;
         }  
     }
-    public void setPalavra(int data,int position){
+    public void setPalavra(short data,int position){
         this.palavras[position] = data;
     }
 
-    public int getPalavra(int position){
+    public short getPalavra(int position){
         return this.palavras[position];
     }
 }
