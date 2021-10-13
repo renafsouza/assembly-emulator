@@ -46,6 +46,7 @@ public class Emulador {
         SI = 0;
         AX = 0;
         DX = 0;
+        SR = 0;
         this.memory = new Memory();
         this.error = null;
         this.outputStream="";
@@ -163,11 +164,11 @@ public class Emulador {
     }
     
     public void run(){
-        // while(!this.finished){
+        while(!this.finished){
             // String instruction = this.instructions[this.IP];
-        //     if(inputStreamIndex>=inputStream.size() && instruction.matches("read.*")) break;
-        //     this.step();
-        // }
+            // if(inputStreamIndex>=inputStream.size() && instruction.matches("read.*")) break;
+            this.step();
+        }
     }
 
     public paramTypes paramType(String param){
@@ -203,7 +204,6 @@ public class Emulador {
             break;
             case 0x05: // add opd
                 opd = memory.getPalavra(CS+IP++);
-                print("aaaaaaaaaaaaaaaaaaa"+opd);
                 AX += opd;
             break;
             case 0xf7f6:// div si
@@ -428,7 +428,7 @@ public class Emulador {
             return Short.parseShort(opd.replace("#",""),16);
         }if(opd.matches("[0-9]+")){
             return Short.parseShort(opd);
-        }if(opd.matches("[A-Za-Z][A-Za-Z0-9]*")){
+        }if(opd.matches("[A-Za-z][A-Za-z0-9]*")){
             // TODO retorna valor da variavel
         }
         // Integrar isso aqui, n entendi como funciona

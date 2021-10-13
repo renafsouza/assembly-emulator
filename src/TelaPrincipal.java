@@ -493,18 +493,18 @@ public class TelaPrincipal extends javax.swing.JFrame{
         
         String[] regis = new String[8];
         
-        regis[0] = "AX: "+Emulador.Util.convertIntegerToBinary(emulador.AX) ;
-        regis[1] = "DX: "+Emulador.Util.convertIntegerToBinary(emulador.DX) ;
-        regis[2] = "SP: "+Emulador.Util.convertIntegerToBinary(emulador.SP) ;
-        regis[3] = "SI: "+Emulador.Util.convertIntegerToBinary(emulador.SI) ;
-        regis[4] = "IP: "+Emulador.Util.convertIntegerToBinary(emulador.IP) ;
-        regis[5] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.SR) ;
-        // regis[6] = emulador.CS;
-        // regis[7] = emulador.DS;
+        regis[0] = "AX: "+Emulador.Util.convertIntegerToBinary(emulador.AX);
+        regis[1] = "DX: "+Emulador.Util.convertIntegerToBinary(emulador.DX);
+        regis[2] = "SP: "+Emulador.Util.convertIntegerToBinary(emulador.SP);
+        regis[3] = "SI: "+Emulador.Util.convertIntegerToBinary(emulador.SI);
+        regis[4] = "IP: "+Emulador.Util.convertIntegerToBinary(emulador.IP);
+        regis[5] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.SR);
+        regis[6] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.CS);
+        regis[7] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.DS);
         // esses registradores existem? n encontrei eles no trabalho
 
         listRegisterModel.clear();
-        for(int i = 0; i<5; i++){       
+        for(int i = 0; i<8; i++){       
             listRegisterModel.addElement(regis[i]);
         }
         registers.setModel(listRegisterModel);
