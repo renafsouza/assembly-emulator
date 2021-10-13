@@ -7,13 +7,7 @@ package Emulador;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Stack;
 
-
-/**
- *
- * @author renafs
- */
 public class Emulador {
     public void print(String word){
         System.out.println(word);
@@ -45,10 +39,6 @@ public class Emulador {
     public short DS = 3000;
     public short CS = 1000;
     public short SS = 0;
-
-
-    // Flags
-    private boolean ZF = false;
     
     public void reset(){
         finished = false;
@@ -74,7 +64,7 @@ public class Emulador {
             else if(instruction.matches("add AX DX")){
                 memory.setPalavra((short)0x03C2, CS+j);
             }else if(instruction.matches("add AX "+opdRegex)){
-                memory.setPalavra((short)0x03, CS+j++);
+                memory.setPalavra((short)0x05, CS+j++);
                 memory.setPalavra(calculateOpd(params[1]), CS+j);
             }else if(instruction.matches("div SI")){
                 memory.setPalavra((short)0xf7f6, CS+j);
@@ -212,7 +202,8 @@ public class Emulador {
                 AX += DX;
             break;
             case 0x05: // add opd
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
+                print("aaaaaaaaaaaaaaaaaaa"+opd);
                 AX += opd;
             break;
             case 0xf7f6:// div si
@@ -232,7 +223,7 @@ public class Emulador {
                 AX -= DX;
             break;
             case 0x25:// sub opd
-                memory.getPalavra(IP++);
+                memory.getPalavra(CS+IP++);
                 AX -= opd;
             break;
             // case 0xf7f6:// mul si
@@ -244,7 +235,7 @@ public class Emulador {
                 DX = (short)(mul >>> 8);
             break;
             case 0x3d:// cmp opd
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 setFlag("zf", AX == opd);
             break;
             case 0x3bc2://cmp DX
@@ -258,7 +249,7 @@ public class Emulador {
             break;
             // case 0x25:// and opd
                 //todo
-                // IP++;
+                // CS+IP++;
             // break;
             case 0xf8c0:// not ax
                 AX = (short)~AX;
@@ -270,7 +261,7 @@ public class Emulador {
                 AX|=DX;
             break;
             case 0x0d:// or opd
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 AX|=opd;
             break;
             case 0x33c0:// xor ax
@@ -280,27 +271,27 @@ public class Emulador {
                 AX|=DX;
             break;
             case 0x35:// xor opd
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 AX^=opd;
             break;
             case 0xeb:// jmp
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 IP = opd;
             break;
             case 0x74:// jz
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 if(getFlag("zf")) IP = opd;
             break;
             case 0x75:// jnz
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 if(!getFlag("zf")) IP = opd;
             break;
             case 0x7a:// jp
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 if(!getFlag("SF")) IP = opd;
             break;
             case 0xe8:// call
-                opd = memory.getPalavra(IP++);
+                opd = memory.getPalavra(CS+IP++);
                 memory.setPalavra(IP, SI++);
                 IP = opd;
             break;

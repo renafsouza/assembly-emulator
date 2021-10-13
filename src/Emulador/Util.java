@@ -12,7 +12,7 @@ package Emulador;
 public class Util {
     public static String convertIntegerToBinary(short n) {
         if (n == 0) {
-            return "0000000 0000000";
+            return "00000000 00000000";
         }
         StringBuilder binaryNumber = new StringBuilder();
         while (n > 0) {
