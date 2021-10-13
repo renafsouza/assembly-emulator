@@ -61,19 +61,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         initRegister();
         
         
-        System.out.println("bin to dec = " + converter.binToDec("01111")+"\n");
-        System.out.println("dec to bin = " + converter.decToBin("15") + "\n");
-        System.out.println("bin to hex = " + converter.binToHex("01111")+"\n");
-        
-        System.out.println("hex to bin = " + converter.hexToBin("f")+"\n");
-        System.out.println("hex to dec = " + converter.hexToDec("f")+"\n");
-        System.out.println("dec to hex = " + converter.decToHex("15") + "\n");
- 
-        
-        
-        
-        
-        
+             
     }
     
     private void configComponents() throws IOException {
