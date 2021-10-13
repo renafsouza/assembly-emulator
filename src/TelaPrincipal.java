@@ -527,13 +527,13 @@ public class TelaPrincipal extends javax.swing.JFrame{
         terminalMessageLabel.setText(emulador.outputStream);
     }
 
-    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {
+    private void nextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStepActionPerformed
         emulador.loadInstructions(CodigoFonteField.getText());
         this.updateInterfaceData();
         emulador.step();
         this.updateInterfaceData();
         initMemoria();
-    }                                        
+    }//GEN-LAST:event_nextStepActionPerformed
         
     private void highlightLine (){
         // int lineIndex = emulador.finished ? 0 : emulador.IP;
@@ -565,7 +565,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         emulador.reset();
         updateInterfaceData();   
     }
-    private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {
+    private void CarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CarregarArquivoActionPerformed
         // TODO add your handling code here:
         resetActionPerformed(null);
         String ArquivoCarregado = new String("") ;
@@ -588,50 +588,50 @@ public class TelaPrincipal extends javax.swing.JFrame{
         } catch (IOException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                               
+    }//GEN-LAST:event_CarregarArquivoActionPerformed                                         
 
-    private void localizaMemoryFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+    private void localizaMemoryFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localizaMemoryFieldActionPerformed
         // TODO add your handling code here:
         String str = localizaMemoryField.getText();
         memoria.ensureIndexIsVisible(Integer.parseInt(str));
-    }                                                   
+    }//GEN-LAST:event_localizaMemoryFieldActionPerformed
 
-    private void localizaMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                     
+    private void localizaMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localizaMemoryButtonActionPerformed                                                
         // TODO add your handling code here:
         String str = localizaMemoryField.getText();
         memoria.ensureIndexIsVisible(Integer.parseInt(str));
-    }                                                    
+    }//GEN-LAST:event_localizaMemoryButtonActionPerformed
 
-    private void nextMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+    private void nextMemoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextMemoryButtonActionPerformed                                              
         // TODO add your handling code here:
         int i = memoria.getLastVisibleIndex() + 22;
         memoria.ensureIndexIsVisible(i);
-    }                                                
+    }//GEN-LAST:event_nextMemoryButtonActionPerformed                       
 
-    private void prevMomoryButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+    private void prevMomoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevMomoryButtonActionPerformed                                               
         // TODO add your handling code here:
         int i = memoria.getFirstVisibleIndex() - 22;
         memoria.ensureIndexIsVisible(i);
        
-    }                                                
+    }//GEN-LAST:event_prevMomoryButtonActionPerformed
 
     private void displayInputFiledActionPerformed(java.awt.event.ActionEvent evt) {                                                  
         // TODO add your handling code here:
     }                                                 
 
-    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {          
+    private void enterTerminalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterTerminalButtonActionPerformed
         emulador.input(entradaTerminalField.getText());
         // TODO add your handling code here:
         // String Valor = new String("Testando terminal\nComando de entrada e status serão exibido aqui");
         // entradaTerminalField.setText(Valor); // utilizar para a ultima mensagem de comando
-    }                                                   
+    }//GEN-LAST:event_enterTerminalButtonActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) throws IOException{
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">//GEN-BEGIN:initComponents
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
@@ -651,7 +651,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+        //</editor-fold>//GEN-END:initComponents
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -665,7 +665,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         });
     }
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CarregarArquivo;
     private javax.swing.JTextArea CodigoFonteField;
     private javax.swing.JPanel codePanel;
@@ -700,5 +700,5 @@ public class TelaPrincipal extends javax.swing.JFrame{
     private javax.swing.JLabel terminalLabel;
     private javax.swing.JLabel terminalMessageLabel;
     private javax.swing.JPanel terminalPanel;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 }
