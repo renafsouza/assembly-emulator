@@ -424,8 +424,8 @@ public class Emulador {
     short calculateOpd (String opd){
         if(opd.matches("[0-1]+b")){
             return Short.parseShort(opd.replace("b",""),2);
-        }if(opd.matches("#[0-9a-fA-F]+")){
-            return Short.parseShort(opd.replace("#",""),16);
+        }if(opd.matches("0x[0-9a-fA-F]+")){
+            return Short.parseShort(opd.replace("0x",""),16);
         }if(opd.matches("[0-9]+")){
             return Short.parseShort(opd);
         }if(opd.matches("[A-Za-z][A-Za-z0-9]*")){
