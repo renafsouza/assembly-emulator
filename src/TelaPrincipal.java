@@ -499,8 +499,8 @@ public class TelaPrincipal extends javax.swing.JFrame{
         regis[3] = "SI: "+Emulador.Util.convertIntegerToBinary(emulador.SI);
         regis[4] = "IP: "+Emulador.Util.convertIntegerToBinary(emulador.IP);
         regis[5] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.SR);
-        regis[6] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.CS);
-        regis[7] = "SR: "+Emulador.Util.convertIntegerToBinary(emulador.DS);
+        regis[6] = "CS: "+Emulador.Util.convertIntegerToBinary(emulador.CS);
+        regis[7] = "DS: "+Emulador.Util.convertIntegerToBinary(emulador.DS);
         // esses registradores existem? n encontrei eles no trabalho
 
         listRegisterModel.clear();
@@ -523,7 +523,6 @@ public class TelaPrincipal extends javax.swing.JFrame{
     private void updateInterfaceData(){
         this.initRegister();
         this.highlightLine();
-        emulador.print(emulador.outputStream);
         terminalMessageLabel.setText(emulador.outputStream);
     }
 
