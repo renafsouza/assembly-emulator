@@ -536,7 +536,6 @@ public class TelaPrincipal extends javax.swing.JFrame{
         
     private void highlightLine (){
         int lineIndex = emulador.finished ? 0 : emulador.mapIPLineIndex.get(emulador.IP);
-        System.out.println("IP "+emulador.IP);
         try {
             Highlighter hilite = CodigoFonteField.getHighlighter();
             CodigoFonteField.setHighlighter(hilite);
