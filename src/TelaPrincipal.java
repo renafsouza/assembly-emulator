@@ -535,24 +535,26 @@ public class TelaPrincipal extends javax.swing.JFrame{
     }//GEN-LAST:event_nextStepActionPerformed
         
     private void highlightLine (){
-        // int lineIndex = emulador.finished ? 0 : emulador.IP;
-        // try {
-        //     Highlighter hilite = CodigoFonteField.getHighlighter();
-        //     CodigoFonteField.setHighlighter(hilite);
-        //     String word = CodigoFonteField.getText();
-        //     int index = 0;
-        //     int index2 = word.indexOf("\n", index + 1);
-        //     for(int i=0;i<lineIndex;i++){
-        //         index = word.indexOf("\n", index + 1);
-        //         index2 = word.indexOf("\n", index + 1);
-        //     }
-        //     index2 = index2==-1? word.length():index2;
+        int lineIndex = emulador.finished ? 0 : emulador.mapIPLineIndex.get(emulador.IP);
+        System.out.println("IP "+emulador.IP);
+        try {
+            Highlighter hilite = CodigoFonteField.getHighlighter();
+            CodigoFonteField.setHighlighter(hilite);
+            String word = CodigoFonteField.getText();
+            int index = 0;
+            int index2 = word.indexOf("\n", index + 1);
+            for(int i=0;i<lineIndex;i++){
+                index = word.indexOf("\n", index + 1);
+                index2 = word.indexOf("\n", index + 1);
+            }
+            index2 = index2==-1? word.length():index2;
 
-        //     DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
-        //     hilite.addHighlight(index, index2 , painter);
-        // } catch (BadLocationException e) {
-        //     e.printStackTrace();
-        // }
+            DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
+            if(index<0)return;
+            hilite.addHighlight(index, index2 , painter);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
     private void runAllActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here: 

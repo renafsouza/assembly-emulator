@@ -40,6 +40,8 @@ public class Emulador {
     public short CS = 1000;
     public short SS = 0;
     
+    public ArrayList<Integer> mapIPLineIndex = new ArrayList<Integer>();
+
     public void reset(){
         finished = false;
         IP = 0;
@@ -54,8 +56,7 @@ public class Emulador {
     public void loadInstructions(String file){
         String[] instructions = file.split("\\n");
         String opdRegex=".*";
-
-        int j = 0;
+        int j = 0, k = 0;
         for(int i =0;i<instructions.length;i++){
             String instruction = instructions[i].replace(","," ").replace("\\s+"," ");
             String[] words = instruction.split("(\\s|,)+");
@@ -157,7 +158,10 @@ public class Emulador {
             }else{
                 error = "Instrução não reconhecida";
             }
+            mapIPLineIndex.add(k, i);
+            k++;
             j++;
+            if(j>k) k++;
         }
     }
     
