@@ -82,13 +82,11 @@ public class Emulador {
                 memory.setPalavra((short)0xf7f6, CS+j);
             }else if(instruction.matches("mul AX")){
                 memory.setPalavra((short)0xf7f0, CS+j);
+            }else if(instruction.matches("cmp AX DX")){
+                memory.setPalavra((short)0x3BC2, CS+j);
             }else if(instruction.matches("cmp AX "+opdRegex)){
                 memory.setPalavra((short)0x3d, CS+j++);
                 memory.setPalavra(calculateOpd(params[1]), CS+j);
-            }else if(instruction.matches("cmp AX DX")){
-                memory.setPalavra((short)0x3BC2, CS+j);
-            }else if(instruction.matches("and AX AX")){
-                memory.setPalavra((short)0xf7C0, CS+j);
             }else if(instruction.matches("and AX DX")){
                 memory.setPalavra((short)0xf7C2, CS+j);
             }else if(instruction.matches("and AX "+opdRegex)){
@@ -194,6 +192,7 @@ public class Emulador {
         int mul;
         short opd = 0;
         if(finished) return;
+        
         short instruction = memory.getPalavra(CS+IP++);
         switch((int)instruction){
             case 0x03c0:// add ax
@@ -330,16 +329,13 @@ public class Emulador {
                 opd = memory.getPalavra(IP++);
                 outputStream = Util.convertIntegerToBinary(opd);
                 if(inputStream.size()>inputStreamIndex){
-                    print("read "+inputStream.get(inputStreamIndex));
                     memory.setPalavra(inputStream.get(inputStreamIndex++).shortValue(), opd);
                 }else{
-                    print("read");
                     IP-=2;
                 }
             break;
             case 0x08:// write opd
                 opd = memory.getPalavra(CS+IP++);
-                System.out.println("out: "+Util.convertIntegerToBinary(opd));
                 outputStream = Util.convertIntegerToBinary(opd);
             break;
             case 0xEE: // hlt
@@ -404,20 +400,26 @@ public class Emulador {
         }
     }
 
-    public void setFlag(String flag, boolean value){
+    public void setFlag(String flag, boolean set){
         switch(flag){
             case "of":
-                 this.SR = (short)Util.setBit(this.SR, 12, value);
+                 SR = Util.modifyBit(SR, 12, set);
+                 break;
             case "sf":
-                 this.SR = (short)Util.setBit(this.SR, 9, value);
+                 SR = Util.modifyBit(SR, 9, set);
+                 break;
             case "zf":
-                 this.SR = (short)Util.setBit(this.SR, 8, value);
+                 SR = Util.modifyBit(SR, 8, set);
+                 break;
             case "if":
-                 this.SR = (short)Util.setBit(this.SR, 7, value);
+                 SR = Util.modifyBit(SR, 7, set);
+                 break;
             case "pf":
-                 this.SR = (short)Util.setBit(this.SR, 6, value);
+                 SR = Util.modifyBit(SR, 6, set);
+                 break;
             case "cf":
-                 this.SR = (short)Util.setBit(this.SR, 0, value);
+                 SR = Util.modifyBit(SR, 0, set);
+                 break;
         }
     }
 
